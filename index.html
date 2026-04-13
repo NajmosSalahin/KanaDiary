@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KanaDiary</title>
+
+  <!-- Included 20 unique Japanese fonts ranging from basic to textbook, marker, cute, and pixel styles -->
+  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic&family=BIZ+UDMincho&family=Dela+Gothic+One&family=DotGothic16&family=Figtree:wght@400;500;600;700&family=Hachi+Maru+Pop&family=JetBrains+Mono:wght@400;600&family=Kaisei+Decol&family=Klee+One&family=M+PLUS+Rounded+1c&family=Noto+Sans+JP:wght@400;500;600&family=Noto+Serif+JP:wght@400;500;600&family=Potta+One&family=Rampart+One&family=Reggae+One&family=RocknRoll+One&family=Shippori+Mincho:wght@500;600&family=Stick&family=Train+One&family=Yusei+Magic&family=Zen+Kaku+Gothic+New:wght@400;500&family=Zen+Old+Mincho:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ========================================================
+       BASE STYLES & LAYOUT
+    ======================================================== */
+    html {
+      zoom: 1.1;
+    }
+
+    :root {
+      /* Fallback variables */
+      --bg: #0f1419;
+      --card: rgba(26, 31, 40, 0.7);
+      --card-hover: rgba(35, 42, 53, 0.9);
+      --text: #ffffff;
+      --muted: #8b949e;
+      --border: rgba(255, 255, 255, 0.1);
+      
+      /* Vibrant 6-Color System */
+      --c1: #6496ff;
+      --c2: #7aa3ff;
+      --c3: #ff7eb6;
+      --c4: #52e5e5;
+      --c5: #fdfd96;
+      --c6: #a78bfa;
+
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --bg-grad-alpha: 12%;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      /* Dynamic multi-color background gradient generated purely from the theme's colors! */
+      background-image: 
+        radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--c1) var(--bg-grad-alpha), transparent), transparent 50%), 
+        radial-gradient(circle at 90% 80%, color-mix(in srgb, var(--c3) var(--bg-grad-alpha), transparent), transparent 50%);
+      background-attachment: fixed;
+      color: var(--text);
+      transition: background-color 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 900px; 
+      margin: 0 auto;
+      padding: 60px 24px;
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========================================================
+       HEADER
+    ======================================================== */
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-weight: 500;
+      font-size: 3.2rem;
+      letter-spacing: -0.05em;
+      color: var(--text);
+      text-shadow: 0 4px 24px color-mix(in srgb, var(--c1) 30%, transparent);
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.15rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* ========================================================
+       CONTROLS & DROPDOWNS
+    ======================================================== */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 40px;
+      background: transparent;
+      width: 100%;
+    }
+
+    .controls-left, .controls-right {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    button, .select-trigger {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      box-shadow: 0 8px 32px var(--shadow-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button:hover, .select-trigger:hover, .select-trigger:focus-visible {
+      border-color: color-mix(in srgb, var(--c1) 60%, transparent);
+      color: var(--text);
+      transform: translateY(-2px);
+      background: var(--card-hover);
+      box-shadow: 0 8px 20px color-mix(in srgb, var(--c1) 20%, transparent);
+    }
+
+    button.active {
+      background: var(--c1);
+      border-color: var(--c1);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 20px color-mix(in srgb, var(--c1) 40%, transparent);
+    }
+
+    /* Segmented Control Grouping */
+    .segmented-control {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: color-mix(in srgb, var(--card) 40%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 6px;
+      gap: 4px;
+      box-shadow: 0 8px 32px var(--shadow-color);
+    }
+
+    .segmented-control button {
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin: 0;
+    }
+
+    .segmented-control button:hover, .segmented-control button:focus-visible {
+      background: color-mix(in srgb, var(--text) 8%, transparent);
+      transform: none; /* Prevent jumping inside the pill */
+      box-shadow: none;
+    }
+
+    .segmented-control button.active {
+      background: var(--c1);
+      color: #fff;
+      box-shadow: 0 4px 16px color-mix(in srgb, var(--c1) 40%, transparent);
+      transform: none;
+    }
+
+    .select-trigger.open {
+      border-color: var(--c1);
+      color: var(--c1);
+      background: var(--card-hover);
+    }
+
+    .select-trigger svg.chevron {
+      transition: transform 0.3s ease;
+      opacity: 0.7;
+    }
+
+    .select-trigger.open svg.chevron {
+      transform: rotate(180deg);
+    }
+
+    .theme-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .custom-select {
+      position: relative;
+    }
+
+    .select-options {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px;
+      min-width: 220px;
+      max-height: 50vh;
+      overflow-y: auto;
+      box-shadow: 0 16px 40px var(--shadow-color);
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.98);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: top right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .custom-select.open .select-options {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .select-options::-webkit-scrollbar { width: 6px; }
+    .select-options::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
+    .select-options::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    .select-options::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    .option {
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      outline: none;
+    }
+
+    .option .opt-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .option:hover, .option:focus-visible {
+      background: color-mix(in srgb, var(--text) 5%, transparent);
+      color: var(--text);
+    }
+
+    .option.selected {
+      background: color-mix(in srgb, var(--c1) 15%, transparent);
+      color: var(--c1);
+      font-weight: 700;
+    }
+
+    .option.selected::after {
+      content: '✔';
+      font-size: 1rem;
+      color: var(--c2);
+      font-family: system-ui, sans-serif;
+    }
+
+    /* ========================================================
+       GRID & KANA CELLS
+    ======================================================== */
+    .chart-wrapper {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 8px 32px var(--shadow-color);
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .kana-grid {
+      display: grid;
+      grid-template-columns: 28px repeat(5, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .grid-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-transform: lowercase;
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    .col-header { color: var(--c3); }
+    .row-header { color: var(--c4); }
+
+    .kana-cell {
+      position: relative;
+      aspect-ratio: 1 / 1.1;
+      padding: 16px 8px;
+      text-align: center;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--bg) 40%, transparent);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .kana-cell.empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .kana-cell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, color-mix(in srgb, var(--c1) 20%, transparent), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .kana-cell:hover {
+      transform: translateY(-4px) scale(1.05);
+      border-color: color-mix(in srgb, var(--c1) 70%, transparent);
+      box-shadow: 0 12px 24px color-mix(in srgb, var(--c1) 25%, transparent);
+      background: var(--card-hover);
+      z-index: 2;
+    }
+
+    .kana-cell:hover::before {
+      opacity: 1;
+    }
+
+    .kana-cell:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .kana-char {
+      position: relative;
+      font-size: 2.2rem;
+      line-height: 1;
+      color: var(--text);
+      font-weight: 500;
+      transition: color 0.3s ease;
+      z-index: 1;
+    }
+
+    .kana-romaji {
+      position: relative;
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      z-index: 1;
+      text-transform: lowercase;
+    }
+
+    .kana-cell:hover .kana-char {
+      color: var(--c1);
+      text-shadow: 0 0 12px color-mix(in srgb, var(--c1) 40%, transparent);
+    }
+
+    .kana-cell:hover .kana-romaji {
+      color: var(--c2);
+    }
+
+    /* ========================================================
+       PRONUNCIATION TOOLTIP & INFO BUTTON
+    ======================================================== */
+    .info-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: color-mix(in srgb, var(--card) 60%, transparent);
+      border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+      z-index: 10;
+      outline: none;
+    }
+
+    .kana-cell:hover .info-btn, .info-btn:focus-visible {
+      opacity: 0.7;
+    }
+
+    .info-btn:hover, .info-btn:focus-visible {
+      background: var(--c3);
+      color: #fff;
+      border-color: var(--c3);
+      transform: scale(1.1);
+      opacity: 1;
+    }
+
+    .pronunciation-tip {
+      position: fixed;
+      background: var(--card-hover);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--c1);
+      color: var(--text);
+      padding: 16px 20px;
+      border-radius: 16px;
+      font-family: 'Figtree', sans-serif;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 9999;
+      box-shadow: 0 10px 40px var(--shadow-color), 0 0 20px color-mix(in srgb, var(--c1) 25%, transparent);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 240px;
+      max-width: 340px;
+    }
+
+    .pronunciation-tip.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .tip-header {
+      display: flex;
+      align-items: center;
+    }
+
+    .pronunciation-tip .romaji-hl {
+      color: var(--c5);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.2rem;
+      background: color-mix(in srgb, var(--c5) 15%, transparent);
+      padding: 4px 12px;
+      border-radius: 8px;
+      text-transform: lowercase;
+    }
+
+    .tip-desc {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .tip-examples {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      padding-top: 14px;
+      border-top: 1px dashed color-mix(in srgb, var(--border) 100%, transparent);
+    }
+
+    .example-item {
+      display: grid;
+      grid-template-columns: minmax(60px, auto) minmax(60px, auto) 1fr;
+      align-items: center;
+      gap: 16px;
+      background: color-mix(in srgb, var(--bg) 60%, transparent);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .example-item:hover, .example-item:focus-visible {
+      background: color-mix(in srgb, var(--card-hover) 80%, transparent);
+      border-color: color-mix(in srgb, var(--c1) 50%, transparent);
+      transform: translateX(4px);
+      outline: none;
+    }
+
+    .example-jp {
+      font-weight: 600;
+      font-family: 'Noto Sans JP', sans-serif;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .example-ro {
+      color: var(--c2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .example-en {
+      color: var(--c4);
+      font-size: 0.85rem;
+      font-style: italic;
+      text-align: right;
+      line-height: 1.2;
+    }
+
+    /* ========================================================
+       RESPONSIVENESS & MOBILE LAYOUT
+    ======================================================== */
+    @media (max-width: 600px) {
+      .container { padding: 30px 16px; }
+      .header h1 { font-size: 2.5rem; }
+      .chart-wrapper { padding: 20px; border-radius: 20px; }
+      .kana-grid { grid-template-columns: 16px repeat(5, 1fr); gap: 8px; }
+      .grid-header { font-size: 0.85rem; }
+      .kana-cell { padding: 12px 4px; border-radius: 12px; }
+      .kana-char { font-size: 1.8rem; }
+      .kana-romaji { font-size: 0.75rem; }
+      .info-btn { opacity: 0.5; width: 20px; height: 20px; top: 4px; right: 4px; }
+      .info-btn svg { width: 10px; height: 10px; }
+      .controls { gap: 16px; justify-content: center; }
+      button, .select-trigger { padding: 10px 16px; font-size: 0.9rem; }
+      
+      /* Mobile Tooltip Docking */
+      .pronunciation-tip {
+        left: 50% !important;
+        top: auto !important;
+        bottom: 20px !important;
+        transform: translate(-50%, 20px) scale(0.95) !important;
+        width: calc(100% - 32px);
+        max-width: 100%;
+      }
+
+      .pronunciation-tip.visible {
+        transform: translate(-50%, 0) scale(1) !important;
+      }
+
+      /* Dropdown Overflow Fix for Mobile (Centered Modal Style) */
+      .select-options {
+        position: fixed;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 85vw !important;
+        max-width: 320px;
+        max-height: 60vh !important;
+        transform: translate(-50%, -40%) scale(0.95) !important;
+        border-radius: 20px !important;
+        z-index: 10000 !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 
+                    0 0 0 2000px rgba(0, 0, 0, 0.4) !important;
+      }
+
+      .custom-select.open .select-options {
+        transform: translate(-50%, -50%) scale(1) !important;
+      }
+    }
+
+    /* ========================================================
+       THEMES (40 Total: 22 Dark, 18 Light) 
+       Multi-Color Palette System applied to all themes
+    ======================================================== */
+    /* --- DARK THEMES --- */
+    .theme-night {
+      --bg: #0d1117; --card: rgba(22, 27, 34, 0.7); --card-hover: rgba(33, 38, 45, 0.9);
+      --text: #e6edf3; --muted: #7d8590; --border: rgba(255, 255, 255, 0.1);
+      --c1: #58a6ff; --c2: #3fb950; --c3: #d2a8ff; --c4: #ff7b72; --c5: #f2cc60; --c6: #38bdf8;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-catppuccin {
+      --bg: #1e1e2e; --card: rgba(49, 50, 68, 0.6); --card-hover: rgba(69, 71, 90, 0.8);
+      --text: #cdd6f4; --muted: #a6adc8; --border: rgba(180, 190, 254, 0.15);
+      --c1: #cba6f7; --c2: #89b4fa; --c3: #a6e3a1; --c4: #f38ba8; --c5: #fab387; --c6: #f5c2e7;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-gruvbox {
+      --bg: #282828; --card: rgba(60, 56, 54, 0.7); --card-hover: rgba(80, 73, 69, 0.9);
+      --text: #ebdbb2; --muted: #a89984; --border: rgba(235, 219, 178, 0.1);
+      --c1: #fabd2f; --c2: #fe8019; --c3: #b8bb26; --c4: #fb4934; --c5: #d3869b; --c6: #8ec07c;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 10%;
+    }
+    .theme-tokyo {
+      --bg: #1a1b26; --card: rgba(36, 40, 59, 0.7); --card-hover: rgba(41, 46, 66, 0.9);
+      --text: #c0caf5; --muted: #565f89; --border: rgba(122, 162, 247, 0.15);
+      --c1: #7aa2f7; --c2: #bb9af7; --c3: #9ece6a; --c4: #f7768e; --c5: #e0af68; --c6: #7dcfff;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-nord {
+      --bg: #2e3440; --card: rgba(59, 66, 82, 0.7); --card-hover: rgba(67, 76, 94, 0.9);
+      --text: #eceff4; --muted: #d8dee9; --border: rgba(216, 222, 233, 0.1);
+      --c1: #88c0d0; --c2: #81a1c1; --c3: #a3be8c; --c4: #bf616a; --c5: #ebcb8b; --c6: #b48ead;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 10%;
+    }
+    .theme-dracula {
+      --bg: #282a36; --card: rgba(68, 71, 90, 0.5); --card-hover: rgba(68, 71, 90, 0.8);
+      --text: #f8f8f2; --muted: #6272a4; --border: rgba(189, 147, 249, 0.2);
+      --c1: #bd93f9; --c2: #ff79c6; --c3: #50fa7b; --c4: #ff5555; --c5: #f1fa8c; --c6: #8be9fd;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-rosepine {
+      --bg: #191724; --card: rgba(31, 29, 46, 0.7); --card-hover: rgba(38, 35, 58, 0.9);
+      --text: #e0def4; --muted: #908caa; --border: rgba(224, 222, 244, 0.1);
+      --c1: #c4a7e7; --c2: #eb6f92; --c3: #f6c177; --c4: #9ccfd8; --c5: #31748f; --c6: #ea9a97;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-cyberpunk {
+      --bg: #0d0221; --card: rgba(26, 9, 51, 0.6); --card-hover: rgba(38, 15, 77, 0.8);
+      --text: #e0d3ff; --muted: #715c99; --border: rgba(0, 229, 255, 0.2);
+      --c1: #00e5ff; --c2: #ff00ff; --c3: #fcee09; --c4: #00ff00; --c5: #ff003c; --c6: #715c99;
+      --shadow-color: rgba(0,0,0,0.4); --bg-grad-alpha: 15%;
+    }
+    .theme-obsidian {
+      --bg: #0f0f0f; --card: rgba(28, 28, 28, 0.8); --card-hover: rgba(40, 40, 40, 1);
+      --text: #e8eaed; --muted: #9aa0a6; --border: rgba(255, 255, 255, 0.05);
+      --c1: #8ab4f8; --c2: #c586c0; --c3: #4ec9b0; --c4: #ce9178; --c5: #d16969; --c6: #b5cea8;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 10%;
+    }
+    .theme-coral-dark {
+      --bg: #1b1a1f; --card: rgba(38, 36, 44, 0.7); --card-hover: rgba(49, 46, 56, 0.9);
+      --text: #f1e9e0; --muted: #b8a9a0; --border: rgba(255, 127, 80, 0.15);
+      --c1: #ff7f50; --c2: #ff9b73; --c3: #ffd700; --c4: #48d1cc; --c5: #ff69b4; --c6: #98fb98;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-forest-dark {
+      --bg: #0f1a14; --card: rgba(22, 35, 28, 0.7); --card-hover: rgba(28, 45, 36, 0.9);
+      --text: #e6f1ea; --muted: #a3b7ab; --border: rgba(107, 191, 138, 0.2);
+      --c1: #6bbf8a; --c2: #8fd9a8; --c3: #e5c07b; --c4: #56b6c2; --c5: #d19a66; --c6: #c678dd;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-onedark {
+      --bg: #282c34; --card: rgba(33, 37, 43, 0.7); --card-hover: rgba(44, 49, 58, 0.9);
+      --text: #abb2bf; --muted: #5c6370; --border: rgba(97, 175, 239, 0.15);
+      --c1: #61afef; --c2: #c678dd; --c3: #98c379; --c4: #e06c75; --c5: #d19a66; --c6: #56b6c2;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-solarized-dark {
+      --bg: #002b36; --card: rgba(7, 54, 66, 0.7); --card-hover: rgba(10, 69, 84, 0.9);
+      --text: #eee8d5; --muted: #93a1a1; --border: rgba(181, 137, 0, 0.2);
+      --c1: #b58900; --c2: #cb4b16; --c3: #859900; --c4: #dc322f; --c5: #6c71c4; --c6: #2aa198;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-monokai {
+      --bg: #272822; --card: rgba(56, 56, 48, 0.7); --card-hover: rgba(73, 72, 62, 0.9);
+      --text: #f8f8f2; --muted: #75715e; --border: rgba(166, 226, 46, 0.15);
+      --c1: #a6e22e; --c2: #f92672; --c3: #66d9ef; --c4: #fd971f; --c5: #ae81ff; --c6: #e6db74;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-kanagawa-dark {
+      --bg: #1f1f28; --card: rgba(42, 42, 55, 0.7); --card-hover: rgba(54, 54, 70, 0.9);
+      --text: #dcd7ba; --muted: #727169; --border: rgba(126, 156, 216, 0.15);
+      --c1: #7e9cd8; --c2: #957fb8; --c3: #98bb6c; --c4: #c34043; --c5: #ffa066; --c6: #7aa89f;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 10%;
+    }
+    .theme-everforest-dark {
+      --bg: #2b3339; --card: rgba(50, 60, 65, 0.7); --card-hover: rgba(58, 69, 74, 0.9);
+      --text: #d3c6aa; --muted: #859289; --border: rgba(167, 192, 128, 0.15);
+      --c1: #a7c080; --c2: #7fbbb3; --c3: #d3869b; --c4: #e67e80; --c5: #dbbc7f; --c6: #83c092;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 10%;
+    }
+    .theme-material-dark {
+      --bg: #263238; --card: rgba(55, 71, 79, 0.7); --card-hover: rgba(69, 90, 100, 0.9);
+      --text: #eceff1; --muted: #90a4ae; --border: rgba(128, 203, 196, 0.15);
+      --c1: #80cbc4; --c2: #81d4fa; --c3: #c5e1a5; --c4: #ef9a9a; --c5: #ce93d8; --c6: #ffcc80;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-ayu-dark {
+      --bg: #0f1419; --card: rgba(31, 36, 48, 0.7); --card-hover: rgba(42, 48, 64, 0.9);
+      --text: #e6e1cf; --muted: #5c6773; --border: rgba(255, 204, 102, 0.15);
+      --c1: #ffcc66; --c2: #36a3d9; --c3: #c2d94c; --c4: #f07178; --c5: #ffb454; --c6: #d2a6ff;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-astral {
+      --bg: #0b0f1a; --card: rgba(18, 24, 38, 0.7); --card-hover: rgba(28, 36, 64, 0.9);
+      --text: #e6eeff; --muted: #4e5e7d; --border: rgba(125, 249, 255, 0.15);
+      --c1: #7df9ff; --c2: #9d7dff; --c3: #00ffcc; --c4: #ff4d6d; --c5: #ff9e00; --c6: #bd00ff;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-midnight {
+      --bg: #020617; --card: rgba(15, 23, 42, 0.7); --card-hover: rgba(30, 41, 59, 0.9);
+      --text: #f8fafc; --muted: #64748b; --border: rgba(56, 189, 248, 0.15);
+      --c1: #38bdf8; --c2: #818cf8; --c3: #34d399; --c4: #fb7185; --c5: #fbbf24; --c6: #a78bfa;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 12%;
+    }
+    .theme-eclipse {
+      --bg: #1c1c1c; --card: rgba(45, 45, 45, 0.7); --card-hover: rgba(58, 58, 58, 0.9);
+      --text: #eaeaea; --muted: #808080; --border: rgba(156, 220, 254, 0.15);
+      --c1: #9cdcfe; --c2: #4ec9b0; --c3: #ce9178; --c4: #d16969; --c5: #dcdcaa; --c6: #c586c0;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 10%;
+    }
+    .theme-nebula {
+      --bg: #0a0f2c; --card: rgba(17, 24, 63, 0.7); --card-hover: rgba(30, 37, 96, 0.9);
+      --text: #e6e9ff; --muted: #6b75aa; --border: rgba(0, 212, 255, 0.2);
+      --c1: #00d4ff; --c2: #9d4edd; --c3: #ff007f; --c4: #39ff14; --c5: #f9e2af; --c6: #ff9e00;
+      --shadow-color: rgba(0,0,0,0.3); --bg-grad-alpha: 15%;
+    }
+
+    /* --- LIGHT THEMES --- */
+    .theme-paper {
+      --bg: #fdfdfd; --card: rgba(255, 255, 255, 0.8); --card-hover: #ffffff;
+      --text: #222222; --muted: #757575; --border: rgba(0, 0, 0, 0.08);
+      --c1: #d94a38; --c2: #4a90e2; --c3: #e67e22; --c4: #27ae60; --c5: #8e44ad; --c6: #e74c3c;
+      --shadow-color: rgba(0,0,0,0.06); --bg-grad-alpha: 3%;
+    }
+    .theme-sepia {
+      --bg: #f4ecd8; --card: rgba(253, 246, 227, 0.7); --card-hover: rgba(255, 250, 235, 0.95);
+      --text: #433422; --muted: #8b7d6b; --border: rgba(67, 52, 34, 0.1);
+      --c1: #b58900; --c2: #268bd2; --c3: #859900; --c4: #dc322f; --c5: #d33682; --c6: #cb4b16;
+      --shadow-color: rgba(67, 52, 34, 0.08); --bg-grad-alpha: 4%;
+    }
+    .theme-minimal-light {
+      --bg: #ffffff; --card: #f9f9f9; --card-hover: #ffffff;
+      --text: #111111; --muted: #888888; --border: rgba(0,0,0, 0.05);
+      --c1: #3b82f6; --c2: #8b5cf6; --c3: #10b981; --c4: #ef4444; --c5: #f59e0b; --c6: #06b6d4;
+      --shadow-color: rgba(0,0,0,0.05); --bg-grad-alpha: 3%;
+    }
+    .theme-catppuccin-latte {
+      --bg: #eff1f5; --card: rgba(230, 233, 239, 0.7); --card-hover: rgba(240, 243, 249, 0.95);
+      --text: #4c4f69; --muted: #8c8fa1; --border: rgba(76, 79, 105, 0.1);
+      --c1: #1e66f5; --c2: #ea76cb; --c3: #40a02b; --c4: #d20f39; --c5: #fe640b; --c6: #8839ef;
+      --shadow-color: rgba(76, 79, 105, 0.08); --bg-grad-alpha: 4%;
+    }
+    .theme-gruvbox-light {
+      --bg: #fbf1c7; --card: rgba(235, 219, 178, 0.6); --card-hover: rgba(245, 229, 188, 0.9);
+      --text: #3c3836; --muted: #7c6f64; --border: rgba(60, 56, 54, 0.15);
+      --c1: #b57614; --c2: #af3a03; --c3: #79740e; --c4: #9d0006; --c5: #8f3f71; --c6: #427b58;
+      --shadow-color: rgba(60, 56, 54, 0.1); --bg-grad-alpha: 5%;
+    }
+    .theme-tokyo-day {
+      --bg: #e1e2e7; --card: rgba(203, 204, 214, 0.6); --card-hover: rgba(220, 221, 231, 0.9);
+      --text: #3760bf; --muted: #848cb5; --border: rgba(55, 96, 191, 0.15);
+      --c1: #2e7de9; --c2: #9854f1; --c3: #587539; --c4: #f52a65; --c5: #8c6c3e; --c6: #007197;
+      --shadow-color: rgba(55, 96, 191, 0.08); --bg-grad-alpha: 5%;
+    }
+    .theme-nord-light {
+      --bg: #eceff4; --card: rgba(229, 233, 240, 0.7); --card-hover: rgba(240, 244, 252, 0.95);
+      --text: #2e3440; --muted: #4c566a; --border: rgba(46, 52, 64, 0.1);
+      --c1: #5e81ac; --c2: #88c0d0; --c3: #a3be8c; --c4: #bf616a; --c5: #d08770; --c6: #b48ead;
+      --shadow-color: rgba(46, 52, 64, 0.08); --bg-grad-alpha: 5%;
+    }
+    .theme-rosepine-dawn {
+      --bg: #faf4ed; --card: rgba(242, 233, 225, 0.7); --card-hover: rgba(255, 246, 238, 0.95);
+      --text: #575279; --muted: #9893a5; --border: rgba(87, 82, 121, 0.1);
+      --c1: #907aaa; --c2: #d7827e; --c3: #286983; --c4: #b4637a; --c5: #ea9d34; --c6: #56949f;
+      --shadow-color: rgba(87, 82, 121, 0.06); --bg-grad-alpha: 4%;
+    }
+    .theme-solarized-light {
+      --bg: #fdf6e3; --card: rgba(238, 232, 213, 0.7); --card-hover: rgba(250, 244, 224, 0.95);
+      --text: #657b83; --muted: #93a1a1; --border: rgba(101, 123, 131, 0.15);
+      --c1: #268bd2; --c2: #d33682; --c3: #859900; --c4: #dc322f; --c5: #6c71c4; --c6: #cb4b16;
+      --shadow-color: rgba(101, 123, 131, 0.08); --bg-grad-alpha: 5%;
+    }
+    .theme-kanagawa-lotus {
+      --bg: #f2ecbc; --card: rgba(229, 221, 176, 0.6); --card-hover: rgba(240, 232, 187, 0.9);
+      --text: #545464; --muted: #716e61; --border: rgba(84, 84, 100, 0.15);
+      --c1: #43436c; --c2: #c84053; --c3: #6f894e; --c4: #d7474b; --c5: #e98a00; --c6: #5d57a3;
+      --shadow-color: rgba(84, 84, 100, 0.08); --bg-grad-alpha: 5%;
+    }
+    .theme-everforest-light {
+      --bg: #fdf6e3; --card: rgba(244, 240, 217, 0.7); --card-hover: rgba(255, 252, 230, 0.95);
+      --text: #5c6a72; --muted: #939f91; --border: rgba(92, 106, 114, 0.15);
+      --c1: #859289; --c2: #df69ba; --c3: #8da101; --c4: #f85552; --c5: #dfa000; --c6: #35a77c;
+      --shadow-color: rgba(92, 106, 114, 0.06); --bg-grad-alpha: 4%;
+    }
+    .theme-material-light {
+      --bg: #fafafa; --card: rgba(245, 245, 245, 0.8); --card-hover: rgba(255, 255, 255, 1);
+      --text: #37474f; --muted: #90a4ae; --border: rgba(55, 71, 79, 0.1);
+      --c1: #009688; --c2: #03a9f4; --c3: #8bc34a; --c4: #e53935; --c5: #ab47bc; --c6: #ff9800;
+      --shadow-color: rgba(55, 71, 79, 0.06); --bg-grad-alpha: 4%;
+    }
+    .theme-ayu-light {
+      --bg: #fafafa; --card: rgba(240, 240, 240, 0.8); --card-hover: #ffffff;
+      --text: #5c6166; --muted: #8a9199; --border: rgba(92, 97, 102, 0.1);
+      --c1: #f2ae49; --c2: #36a3d9; --c3: #86b300; --c4: #f07178; --c5: #a37acc; --c6: #4cbf99;
+      --shadow-color: rgba(92, 97, 102, 0.06); --bg-grad-alpha: 4%;
+    }
+    .theme-sakura {
+      --bg: #fff0f5; --card: rgba(255, 230, 238, 0.7); --card-hover: rgba(255, 245, 248, 0.95);
+      --text: #5c4349; --muted: #a68991; --border: rgba(92, 67, 73, 0.1);
+      --c1: #ff69b4; --c2: #ffb7c5; --c3: #ffc0cb; --c4: #db7093; --c5: #c71585; --c6: #ff1493;
+      --shadow-color: rgba(92, 67, 73, 0.05); --bg-grad-alpha: 8%;
+    }
+    .theme-matcha {
+      --bg: #f4f6f0; --card: rgba(232, 237, 228, 0.7); --card-hover: rgba(242, 245, 239, 0.95);
+      --text: #2c362f; --muted: #758a7a; --border: rgba(44, 54, 47, 0.1);
+      --c1: #5c8b65; --c2: #84b08c; --c3: #a3c4a8; --c4: #3a5a40; --c5: #d4a373; --c6: #ccd5ae;
+      --shadow-color: rgba(44, 54, 47, 0.05); --bg-grad-alpha: 6%;
+    }
+    .theme-sky-light {
+      --bg: #f0f8ff; --card: rgba(225, 240, 255, 0.6); --card-hover: rgba(240, 248, 255, 0.95);
+      --text: #1b3a57; --muted: #6b8ca8; --border: rgba(27, 58, 87, 0.1);
+      --c1: #0080ff; --c2: #4db8ff; --c3: #87cefa; --c4: #4169e1; --c5: #00bfff; --c6: #1e90ff;
+      --shadow-color: rgba(27, 58, 87, 0.05); --bg-grad-alpha: 8%;
+    }
+    .theme-lavender-light {
+      --bg: #f5f3fa; --card: rgba(235, 230, 245, 0.7); --card-hover: rgba(245, 242, 250, 0.95);
+      --text: #3d3159; --muted: #8b7ea8; --border: rgba(61, 49, 89, 0.1);
+      --c1: #8a2be2; --c2: #b19cd9; --c3: #dda0dd; --c4: #9370db; --c5: #ba55d3; --c6: #9932cc;
+      --shadow-color: rgba(61, 49, 89, 0.05); --bg-grad-alpha: 6%;
+    }
+    .theme-coral-light {
+      --bg: #fff5f2; --card: rgba(255, 235, 228, 0.7); --card-hover: rgba(255, 245, 240, 0.95);
+      --text: #5e3a31; --muted: #a67c71; --border: rgba(94, 58, 49, 0.1);
+      --c1: #ff7f50; --c2: #ff9b73; --c3: #ffa07a; --c4: #ff6347; --c5: #ff4500; --c6: #ff8c00;
+      --shadow-color: rgba(94, 58, 49, 0.05); --bg-grad-alpha: 6%;
+    }
+
+    /* ========================================================
+       FONTS (20 Total)
+    ======================================================== */
+    /* Standard / Clean */
+    .kana-font-sans .kana-char {font-family:'Noto Sans JP', sans-serif;}
+    .kana-font-serif .kana-char {font-family:'Noto Serif JP', serif;}
+    .kana-font-rounded .kana-char {font-family:'M PLUS Rounded 1c', sans-serif;}
+    .kana-font-zen-sans .kana-char {font-family:'Zen Kaku Gothic New', sans-serif;}
+    .kana-font-shippori .kana-char {font-family:'Shippori Mincho', serif;}
+
+    /* Textbook (Educational accurate strokes) */
+    .kana-font-biz-sans .kana-char {font-family:'BIZ UDGothic', sans-serif;}
+    .kana-font-biz-serif .kana-char {font-family:'BIZ UDMincho', serif;}
+    .kana-font-klee .kana-char {font-family:'Klee One', cursive;}
+    .kana-font-zen-old .kana-char {font-family:'Zen Old Mincho', serif;}
+    .kana-font-kaisei .kana-char {font-family:'Kaisei Decol', serif;}
+
+    /* Playful / Display */
+    .kana-font-yusei .kana-char {font-family:'Yusei Magic', sans-serif;}
+    .kana-font-hachimaru .kana-char {font-family:'Hachi Maru Pop', cursive;}
+    .kana-font-potta .kana-char {font-family:'Potta One', sans-serif;}
+    .kana-font-rocknroll .kana-char {font-family:'RocknRoll One', sans-serif;}
+    .kana-font-train .kana-char {font-family:'Train One', sans-serif;}
+
+    /* Bold / Stylized */
+    .kana-font-dela .kana-char {font-family:'Dela Gothic One', sans-serif;}
+    .kana-font-rampart .kana-char {font-family:'Rampart One', sans-serif;}
+    .kana-font-reggae .kana-char {font-family:'Reggae One', sans-serif;}
+    .kana-font-stick .kana-char {font-family:'Stick', sans-serif;}
+    .kana-font-dotgothic .kana-char {font-family:'DotGothic16', monospace;}
+
+    /* ========================================================
+       FOOTER
+    ======================================================== */
+    .footer {
+      margin-top: auto;
+      padding: 32px 24px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 24px;
+      font-size: 0.95rem;
+      background: color-mix(in srgb, var(--bg) 80%, transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    .footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer a:hover {
+      color: var(--c6);
+      text-shadow: 0 0 12px color-mix(in srgb, var(--c6) 40%, transparent);
+    }
+  </style>
+</head>
+
+<body class="theme-night kana-font-sans">
+
+<div class="container">
+  <div class="header">
+    <h1>KanaDiary</h1>
+    <p>Your daily journey to mastering Japanese kana.</p>
+  </div>
+
+  <div class="controls">
+    <div class="controls-left">
+      <button id="katakanaToggle">Hiragana</button>
+
+      <div class="segmented-control">
+        <button id="basicBtn" class="active">Basic</button>
+        <button id="dakutenBtn">Dakuten</button>
+        <button id="yoonBtn">Combination</button>
+        <button id="extendedBtn">Extended</button>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="custom-select" id="themeSelectWrapper">
+        <button class="select-trigger" id="themeTrigger" tabindex="0">
+          <span class="theme-icon" id="themeIcon"></span>
+          <span id="themeLabel">Night</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="select-options" id="themeOptions"></div>
+      </div>
+
+      <div class="custom-select" id="fontSelectWrapper">
+        <button class="select-trigger" id="fontTrigger" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+          <span id="fontLabel">Noto Sans JP</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="select-options" id="fontOptions"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-wrapper">
+    <div id="grid" class="kana-grid"></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <a href="https://www.immersionkit.com/" target="_blank">Immersion Kit</a>
+  <a href="https://najmossalahin.github.io/KanaFlow/" target="_blank">KanaDiary GitHub</a>
+  <a href="https://monkeytype.com/" target="_blank">Monkeytype</a>
+  <a href="https://www.kakimashou.com/" target="_blank">Kakimashou</a>
+</footer>
+
+<!-- Tooltip Container -->
+<div id="tooltip" class="pronunciation-tip"></div>
+
+<script>
+  // ===== Icons =====
+  const iconSun = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+  const iconMoon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+
+  // ===== Themes & Fonts Config =====
+  const themes = [
+    {id: "night", name: "Night", type: "dark"},
+    {id: "catppuccin", name: "Catppuccin", type: "dark"},
+    {id: "gruvbox", name: "Gruvbox Dark", type: "dark"},
+    {id: "tokyo", name: "Tokyo Night", type: "dark"},
+    {id: "nord", name: "Nord", type: "dark"},
+    {id: "dracula", name: "Dracula", type: "dark"},
+    {id: "rosepine", name: "Rosé Pine", type: "dark"},
+    {id: "cyberpunk", name: "Cyberpunk", type: "dark"},
+    {id: "obsidian", name: "Obsidian", type: "dark"},
+    {id: "coral-dark", name: "Coral Dark", type: "dark"},
+    {id: "forest-dark", name: "Forest Dark", type: "dark"},
+    {id: "onedark", name: "One Dark", type: "dark"},
+    {id: "solarized-dark", name: "Solarized Dark", type: "dark"},
+    {id: "monokai", name: "Monokai", type: "dark"},
+    {id: "kanagawa-dark", name: "Kanagawa", type: "dark"},
+    {id: "everforest-dark", name: "Everforest Dark", type: "dark"},
+    {id: "material-dark", name: "Material Dark", type: "dark"},
+    {id: "ayu-dark", name: "Ayu Dark", type: "dark"},
+    {id: "astral", name: "Astral", type: "dark"},
+    {id: "midnight", name: "Midnight", type: "dark"},
+    {id: "eclipse", name: "Eclipse", type: "dark"},
+    {id: "nebula", name: "Nebula", type: "dark"},
+    {id: "paper", name: "Paper (Classic)", type: "light"},
+    {id: "sepia", name: "Sepia (Warm)", type: "light"},
+    {id: "minimal-light", name: "Minimal Light", type: "light"},
+    {id: "catppuccin-latte", name: "Catppuccin Latte", type: "light"},
+    {id: "gruvbox-light", name: "Gruvbox Light", type: "light"},
+    {id: "tokyo-day", name: "Tokyo Day", type: "light"},
+    {id: "nord-light", name: "Nord Light", type: "light"},
+    {id: "rosepine-dawn", name: "Rosé Pine Dawn", type: "light"},
+    {id: "solarized-light", name: "Solarized Light", type: "light"},
+    {id: "kanagawa-lotus", name: "Kanagawa Lotus", type: "light"},
+    {id: "everforest-light", name: "Everforest Light", type: "light"},
+    {id: "material-light", name: "Material Light", type: "light"},
+    {id: "ayu-light", name: "Ayu Light", type: "light"},
+    {id: "sakura", name: "Sakura (Pink)", type: "light"},
+    {id: "matcha", name: "Matcha (Green)", type: "light"},
+    {id: "sky-light", name: "Sky (Blue)", type: "light"},
+    {id: "lavender-light", name: "Lavender", type: "light"},
+    {id: "coral-light", name: "Coral Light", type: "light"}
+  ];
+
+  const fonts = [
+    ['kana-font-sans','Noto Sans (Standard)'],
+    ['kana-font-serif','Noto Serif (Standard)'],
+    ['kana-font-rounded','M PLUS Rounded (Soft)'],
+    ['kana-font-zen-sans','Zen Kaku (Clean)'],
+    ['kana-font-shippori', 'Shippori Mincho (Classic)'],
+    ['kana-font-biz-sans','BIZ UDGothic (Textbook Sans)'],
+    ['kana-font-biz-serif','BIZ UDMincho (Textbook Serif)'],
+    ['kana-font-klee','Klee One (Handwriting)'],
+    ['kana-font-zen-old','Zen Old Mincho (Antique)'],
+    ['kana-font-kaisei','Kaisei Decol (Retro)'],
+    ['kana-font-yusei', 'Yusei Magic (Marker)'],
+    ['kana-font-hachimaru', 'Hachi Maru (Cute Pop)'],
+    ['kana-font-potta', 'Potta One (Chubby)'],
+    ['kana-font-rocknroll', 'RocknRoll (Geometric)'],
+    ['kana-font-train', 'Train One (Railway)'],
+    ['kana-font-dela', 'Dela Gothic (Thick)'],
+    ['kana-font-rampart', 'Rampart One (3D Block)'],
+    ['kana-font-reggae', 'Reggae One (Dynamic)'],
+    ['kana-font-stick', 'Stick (Straight)'],
+    ['kana-font-dotgothic', 'DotGothic16 (8-Bit Pixel)']
+  ];
+
+  let currentThemeId = 'night';
+  let currentFont = 'kana-font-sans';
+
+  // State initialization
+  const savedTheme = localStorage.getItem('kanaflow-theme');
+  if(savedTheme && themes.find(t => 'theme-' + t.id === savedTheme)) {
+    currentThemeId = savedTheme.replace('theme-', '');
+  }
+
+  const savedFont = localStorage.getItem('kanaflow-font');
+  if(savedFont && fonts.find(f => f[0] === savedFont)) {
+    currentFont = savedFont;
+  }
+
+  // DOM Elements
+  const themeLabel = document.getElementById('themeLabel');
+  const themeIcon = document.getElementById('themeIcon');
+  const fontLabel = document.getElementById('fontLabel');
+  const themeOptions = document.getElementById('themeOptions');
+  const fontOptions = document.getElementById('fontOptions');
+  const themeWrapper = document.getElementById('themeSelectWrapper');
+  const fontWrapper = document.getElementById('fontSelectWrapper');
+  const themeTrigger = document.getElementById('themeTrigger');
+  const fontTrigger = document.getElementById('fontTrigger');
+
+  function applyThemeFont() {
+    document.body.className = `theme-${currentThemeId} ${currentFont}`;
+    localStorage.setItem('kanaflow-theme', `theme-${currentThemeId}`);
+    localStorage.setItem('kanaflow-font', currentFont);
+    
+    const activeThemeObj = themes.find(t => t.id === currentThemeId);
+    themeLabel.textContent = activeThemeObj.name;
+    themeIcon.innerHTML = activeThemeObj.type === 'light' ? iconSun : iconMoon;
+    
+    Array.from(themeOptions.children).forEach(opt => {
+      opt.classList.toggle('selected', opt.dataset.value === currentThemeId);
+    });
+    Array.from(fontOptions.children).forEach(opt => {
+      opt.classList.toggle('selected', opt.dataset.value === currentFont);
+    });
+  }
+
+  // Build Theme Dropdown
+  themes.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'option' + (t.id === currentThemeId ? ' selected' : '');
+    div.dataset.value = t.id;
+    div.tabIndex = 0;
+    div.innerHTML = `<div class="opt-left"><span class="theme-icon">${t.type === 'light' ? iconSun : iconMoon}</span><span>${t.name}</span></div>`;
+    
+    div.onclick = () => {
+      currentThemeId = t.id;
+      applyThemeFont();
+      closeAllDropdowns();
+    };
+    div.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        div.click();
+      }
+    };
+    themeOptions.appendChild(div);
+  });
+
+  // Build Font Dropdown
+  fonts.forEach(([v, l]) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (v === currentFont ? ' selected' : '');
+    div.dataset.value = v;
+    div.textContent = l;
+    div.tabIndex = 0;
+
+    div.onclick = () => {
+      currentFont = v;
+      fontLabel.textContent = l;
+      applyThemeFont();
+      closeAllDropdowns();
+    };
+    div.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        div.click();
+      }
+    };
+    fontOptions.appendChild(div);
+    if(v === currentFont) fontLabel.textContent = l;
+  });
+
+  // Dropdown Behaviors
+  function handleDropdownToggle(e, wrapper, trigger) {
+    e.stopPropagation();
+    const isOpen = wrapper.classList.contains('open');
+    closeAllDropdowns();
+    if(!isOpen) {
+      wrapper.classList.add('open');
+      trigger.classList.add('open');
+    }
+  }
+
+  themeTrigger.onclick = (e) => handleDropdownToggle(e, themeWrapper, themeTrigger);
+  themeTrigger.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleDropdownToggle(e, themeWrapper, themeTrigger);
+    }
+  };
+
+  fontTrigger.onclick = (e) => handleDropdownToggle(e, fontWrapper, fontTrigger);
+  fontTrigger.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleDropdownToggle(e, fontWrapper, fontTrigger);
+    }
+  };
+
+  function closeAllDropdowns() {
+    themeWrapper.classList.remove('open');
+    themeTrigger.classList.remove('open');
+    fontWrapper.classList.remove('open');
+    fontTrigger.classList.remove('open');
+  }
+
+  document.addEventListener('click', closeAllDropdowns);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllDropdowns();
+  });
+
+
+  // ===== Data Sets & Logic =====
+  const KANA_INFO = {
+    'a':      { d: "Pronounced like the 'a' in 'father'.", h_ex: [{j: 'あさ', r: 'asa', m: 'morning'}, {j: 'あめ', r: 'ame', m: 'rain'}, {j: 'あき', r: 'aki', m: 'autumn'}], k_ex: [{j: 'アイス', r: 'aisu', m: 'ice cream'}, {j: 'アジア', r: 'ajia', m: 'Asia'}, {j: 'アニメ', r: 'anime', m: 'anime'}] },
+    'i':      { d: "Sounds like the 'ee' in 'meet' or 'e' in 'eat'.", h_ex: [{j: 'いぬ', r: 'inu', m: 'dog'}, {j: 'いま', r: 'ima', m: 'now'}, {j: 'いし', r: 'ishi', m: 'stone'}], k_ex: [{j: 'インク', r: 'inku', m: 'ink'}, {j: 'インド', r: 'indo', m: 'India'}, {j: 'イラスト', r: 'irasuto', m: 'illustration'}] },
+    'u':      { d: "Pronounced like the 'oo' in 'boot', but with unrounded lips.", h_ex: [{j: 'うみ', r: 'umi', m: 'sea'}, {j: 'うた', r: 'uta', m: 'song'}, {j: 'うし', r: 'ushi', m: 'cow'}], k_ex: [{j: 'ウイルス', r: 'uirusu', m: 'virus'}, {j: 'ウール', r: 'uuru', m: 'wool'}, {j: 'ウエーター', r: 'ueetaa', m: 'waiter'}] },
+    'e':      { d: "Sounds like the 'e' in 'pet' or 'eh' sound.", h_ex: [{j: 'えき', r: 'eki', m: 'station'}, {j: 'えいが', r: 'eiga', m: 'movie'}, {j: 'えだ', r: 'eda', m: 'branch'}], k_ex: [{j: 'エンジン', r: 'enjin', m: 'engine'}, {j: 'エプロン', r: 'epuron', m: 'apron'}, {j: 'エレベーター', r: 'erebeetaa', m: 'elevator'}] },
+    'o':      { d: "Pronounced like the 'o' in 'old' or 'oh'.", h_ex: [{j: 'おと', r: 'oto', m: 'sound'}, {j: 'おにぎり', r: 'onigiri', m: 'rice ball'}, {j: 'おかね', r: 'okane', m: 'money'}], k_ex: [{j: 'オレンジ', r: 'orenji', m: 'orange'}, {j: 'オイル', r: 'oiru', m: 'oil'}, {j: 'オンライン', r: 'onrain', m: 'online'}] },
+    
+    'ka':     { d: "Sounds like 'k' combined with the 'a' in 'father'.", h_ex: [{j: 'かさ', r: 'kasa', m: 'umbrella'}, {j: 'かお', r: 'kao', m: 'face'}, {j: 'かぎ', r: 'kagi', m: 'key'}], k_ex: [{j: 'カメラ', r: 'kamera', m: 'camera'}, {j: 'カレー', r: 'karee', m: 'curry'}, {j: 'カレンダー', r: 'karendaa', m: 'calendar'}] },
+    'ki':     { d: "Sounds exactly like the word 'key'.", h_ex: [{j: 'き', r: 'ki', m: 'tree'}, {j: 'きのう', r: 'kinou', m: 'yesterday'}, {j: 'きっぷ', r: 'kippu', m: 'ticket'}], k_ex: [{j: 'キロ', r: 'kiro', m: 'kilo'}, {j: 'キス', r: 'kisu', m: 'kiss'}, {j: 'キッチン', r: 'kitchin', m: 'kitchen'}] },
+    'ku':     { d: "Pronounced like 'koo', similar to the bird 'cuckoo'.", h_ex: [{j: 'くつ', r: 'kutsu', m: 'shoes'}, {j: 'くま', r: 'kuma', m: 'bear'}, {j: 'くるま', r: 'kuruma', m: 'car'}], k_ex: [{j: 'クラス', r: 'kurasu', m: 'class'}, {j: 'クラブ', r: 'kurabu', m: 'club'}, {j: 'クイズ', r: 'kuizu', m: 'quiz'}] },
+    'ke':     { d: "Sounds like the letter 'K', or the 'ke' in 'kettle'.", h_ex: [{j: 'けむり', r: 'kemuri', m: 'smoke'}, {j: 'けさ', r: 'kesa', m: 'this morning'}, {j: 'けいさつ', r: 'keisatsu', m: 'police'}], k_ex: [{j: 'ケーキ', r: 'keeki', m: 'cake'}, {j: 'ケース', r: 'keesu', m: 'case'}, {j: 'ケチャップ', r: 'kechappu', m: 'ketchup'}] },
+    'ko':     { d: "Pronounced like 'co' in 'coin', or a short 'koh'.", h_ex: [{j: 'こえ', r: 'koe', m: 'voice'}, {j: 'こころ', r: 'kokoro', m: 'heart'}, {j: 'こども', r: 'kodomo', m: 'child'}], k_ex: [{j: 'コーヒー', r: 'koohii', m: 'coffee'}, {j: 'コート', r: 'kooto', m: 'coat'}, {j: 'コイン', r: 'koin', m: 'coin'}] },
+    
+    'sa':     { d: "Sounds like the 'sa' in 'saw' or a short 'sah'.", h_ex: [{j: 'さかな', r: 'sakana', m: 'fish'}, {j: 'さくら', r: 'sakura', m: 'cherry blossom'}, {j: 'さむい', r: 'samui', m: 'cold'}], k_ex: [{j: 'サラダ', r: 'sarada', m: 'salad'}, {j: 'サッカー', r: 'sakkaa', m: 'soccer'}, {j: 'サイズ', r: 'saizu', m: 'size'}] },
+    'shi':    { d: "Pronounced like the word 'she' in 'sheep'.", h_ex: [{j: 'しお', r: 'shio', m: 'salt'}, {j: 'しろ', r: 'shiro', m: 'white / castle'}, {j: 'しんぶん', r: 'shinbun', m: 'newspaper'}], k_ex: [{j: 'シーツ', r: 'shiitsu', m: 'sheets'}, {j: 'システム', r: 'shisutemu', m: 'system'}, {j: 'シンボル', r: 'shinboru', m: 'symbol'}] },
+    'su':     { d: "Sounds like the 'su' in 'suit', but shorter and unrounded.", h_ex: [{j: 'すし', r: 'sushi', m: 'sushi'}, {j: 'すいか', r: 'suika', m: 'watermelon'}, {j: 'すな', r: 'suna', m: 'sand'}], k_ex: [{j: 'スープ', r: 'suupu', m: 'soup'}, {j: 'スキー', r: 'sukii', m: 'ski'}, {j: 'スーパー', r: 'suupaa', m: 'supermarket'}] },
+    'se':     { d: "Pronounced like the word 'say' without the 'y' at the end.", h_ex: [{j: 'せかい', r: 'sekai', m: 'world'}, {j: 'せんせい', r: 'sensei', m: 'teacher'}, {j: 'せなか', r: 'senaka', m: 'back'}], k_ex: [{j: 'セーター', r: 'seetaa', m: 'sweater'}, {j: 'センター', r: 'sentaa', m: 'center'}, {j: 'セット', r: 'setto', m: 'set'}] },
+    'so':     { d: "Sounds exactly like the word 'so' or 'sew'.", h_ex: [{j: 'そら', r: 'sora', m: 'sky'}, {j: 'そと', r: 'soto', m: 'outside'}, {j: 'そうじ', r: 'souji', m: 'cleaning'}], k_ex: [{j: 'ソース', r: 'soosu', m: 'sauce'}, {j: 'ソフト', r: 'sofuto', m: 'software'}, {j: 'ソーセージ', r: 'sooseeji', m: 'sausage'}] },
+    
+    'ta':     { d: "Pronounced like the 'ta' in 'taco'.", h_ex: [{j: 'たこ', r: 'tako', m: 'octopus'}, {j: 'たまご', r: 'tamago', m: 'egg'}, {j: 'たのしい', r: 'tanoshii', m: 'fun'}], k_ex: [{j: 'タクシー', r: 'takushii', m: 'taxi'}, {j: 'タオル', r: 'taoru', m: 'towel'}, {j: 'タイヤ', r: 'taiya', m: 'tire'}] },
+    'chi':    { d: "Sounds like the 'chee' in 'cheese'.", h_ex: [{j: 'ちち', r: 'chichi', m: 'father'}, {j: 'ちず', r: 'chizu', m: 'map'}, {j: 'ちいさい', r: 'chiisai', m: 'small'}], k_ex: [{j: 'チーズ', r: 'chiizu', m: 'cheese'}, {j: 'チケット', r: 'chiketto', m: 'ticket'}, {j: 'チーム', r: 'chiimu', m: 'team'}] },
+    'tsu':    { d: "Pronounced like the end of 'cats' with an 'oo' added ('tsoo').", h_ex: [{j: 'つき', r: 'tsuki', m: 'moon'}, {j: 'つくえ', r: 'tsukue', m: 'desk'}, {j: 'つめたい', r: 'tsumetai', m: 'cold'}], k_ex: [{j: 'ツアー', r: 'tsuaa', m: 'tour'}, {j: 'ツナ', r: 'tsuna', m: 'tuna'}, {j: 'ツイン', r: 'tsuin', m: 'twin'}] },
+    'te':     { d: "Sounds like the 'te' in 'telephone'.", h_ex: [{j: 'て', r: 'te', m: 'hand'}, {j: 'てがみ', r: 'tegami', m: 'letter'}, {j: 'てんき', r: 'tenki', m: 'weather'}], k_ex: [{j: 'テニス', r: 'tenisu', m: 'tennis'}, {j: 'テスト', r: 'tesuto', m: 'test'}, {j: 'テント', r: 'tento', m: 'tent'}] },
+    'to':     { d: "Pronounced exactly like 'toe', as in your foot.", h_ex: [{j: 'とけい', r: 'tokei', m: 'clock'}, {j: 'とり', r: 'tori', m: 'bird'}, {j: 'ともだち', r: 'tomodachi', m: 'friend'}], k_ex: [{j: 'トイレ', r: 'toire', m: 'toilet'}, {j: 'トマト', r: 'tomato', m: 'tomato'}, {j: 'トップ', r: 'toppu', m: 'top'}] },
+    
+    'na':     { d: "Sounds like 'nah', a casual way to say no.", h_ex: [{j: 'なつ', r: 'natsu', m: 'summer'}, {j: 'なまえ', r: 'namae', m: 'name'}, {j: 'なみだ', r: 'namida', m: 'tear'}], k_ex: [{j: 'ナイフ', r: 'naifu', m: 'knife'}, {j: 'ナンバー', r: 'nanbaa', m: 'number'}, {j: 'ナプキン', r: 'napukin', m: 'napkin'}] },
+    'ni':     { d: "Pronounced exactly like the word 'knee'.", h_ex: [{j: 'にく', r: 'niku', m: 'meat'}, {j: 'にし', r: 'nishi', m: 'west'}, {j: 'にほん', r: 'nihon', m: 'Japan'}], k_ex: [{j: 'ニュース', r: 'nyuusu', m: 'news'}, {j: 'ニーズ', r: 'niizu', m: 'needs'}, {j: 'ニット', r: 'nitto', m: 'knit'}] },
+    'nu':     { d: "Sounds like the 'noo' in 'noon'.", h_ex: [{j: 'いぬ', r: 'inu', m: 'dog'}, {j: 'ぬの', r: 'nuno', m: 'cloth'}, {j: 'ぬるい', r: 'nurui', m: 'lukewarm'}], k_ex: [{j: 'ヌードル', r: 'nuudoru', m: 'noodle'}, {j: 'ヌー', r: 'nuu', m: 'gnu'}, {j: 'カヌー', r: 'kanuu', m: 'canoe'}] },
+    'ne':     { d: "Pronounced like 'nay' without the 'y', or 'ne' in 'net'.", h_ex: [{j: 'ねこ', r: 'neko', m: 'cat'}, {j: 'ねずみ', r: 'nezumi', m: 'mouse'}, {j: 'ねむい', r: 'nemui', m: 'sleepy'}], k_ex: [{j: 'ネクタイ', r: 'nekutai', m: 'necktie'}, {j: 'ネット', r: 'netto', m: 'net'}, {j: 'ネックレス', r: 'nekkuresu', m: 'necklace'}] },
+    'no':     { d: "Sounds exactly like the English word 'no'.", h_ex: [{j: 'のみもの', r: 'nomimono', m: 'beverage'}, {j: 'のど', r: 'nodo', m: 'throat'}, {j: 'のり', r: 'nori', m: 'seaweed'}], k_ex: [{j: 'ノート', r: 'nooto', m: 'notebook'}, {j: 'ノック', r: 'nokku', m: 'knock'}, {j: 'ノルマ', r: 'noruma', m: 'quota'}] },
+    
+    'ha':     { d: "Pronounced like 'ha' when laughing.", h_ex: [{j: 'はな', r: 'hana', m: 'flower'}, {j: 'はこ', r: 'hako', m: 'box'}, {j: 'はし', r: 'hashi', m: 'bridge'}], k_ex: [{j: 'ハンバーガー', r: 'hanbaagaa', m: 'hamburger'}, {j: 'ハム', r: 'hamu', m: 'ham'}, {j: 'ハワイ', r: 'hawai', m: 'Hawaii'}] },
+    'hi':     { d: "Sounds exactly like the word 'he'.", h_ex: [{j: 'ひ', r: 'hi', m: 'fire'}, {j: 'ひこうき', r: 'hikouki', m: 'airplane'}, {j: 'ひだり', r: 'hidari', m: 'left'}], k_ex: [{j: 'ヒーター', r: 'hiitaa', m: 'heater'}, {j: 'ヒント', r: 'hinto', m: 'hint'}, {j: 'ヒーロー', r: 'hiiroo', m: 'hero'}] },
+    'fu':     { d: "A soft blow of air, halfway between an 'f' and an 'h' plus 'oo'.", h_ex: [{j: 'ふね', r: 'fune', m: 'ship'}, {j: 'ふゆ', r: 'fuyu', m: 'winter'}, {j: 'ふく', r: 'fuku', m: 'clothes'}], k_ex: [{j: 'フォーク', r: 'fooku', m: 'fork'}, {j: 'フランス', r: 'furansu', m: 'France'}, {j: 'フィルム', r: 'firumu', m: 'film'}] },
+    'he':     { d: "Pronounced like the word 'hay', but cut short.", h_ex: [{j: 'へや', r: 'heya', m: 'room'}, {j: 'へび', r: 'hebi', m: 'snake'}, {j: 'へいわ', r: 'heiwa', m: 'peace'}], k_ex: [{j: 'ヘリコプター', r: 'herikoputaa', m: 'helicopter'}, {j: 'ヘルメット', r: 'herumetto', m: 'helmet'}, {j: 'ヘア', r: 'hea', m: 'hair'}] },
+    'ho':     { d: "Sounds like the 'ho' in 'hope'.", h_ex: [{j: 'ほん', r: 'hon', m: 'book'}, {j: 'ほし', r: 'hoshi', m: 'star'}, {j: 'ほね', r: 'hone', m: 'bone'}], k_ex: [{j: 'ホテル', r: 'hoteru', m: 'hotel'}, {j: 'ホース', r: 'hoosu', m: 'hose'}, {j: 'ホット', r: 'hotto', m: 'hot'}] },
+    
+    'ma':     { d: "Pronounced like 'ma' as in mother.", h_ex: [{j: 'まち', r: 'machi', m: 'town'}, {j: 'まど', r: 'mado', m: 'window'}, {j: 'まつり', r: 'matsuri', m: 'festival'}], k_ex: [{j: 'マウス', r: 'mausu', m: 'mouse'}, {j: 'マッチ', r: 'matchi', m: 'match'}, {j: 'マスク', r: 'masuku', m: 'mask'}] },
+    'mi':     { d: "Sounds exactly like the word 'me'.", h_ex: [{j: 'みず', r: 'mizu', m: 'water'}, {j: 'みみ', r: 'mimi', m: 'ear'}, {j: 'みどり', r: 'midori', m: 'green'}], k_ex: [{j: 'ミルク', r: 'miruku', m: 'milk'}, {j: 'ミックス', r: 'mikkusu', m: 'mix'}, {j: 'ミニ', r: 'mini', m: 'mini'}] },
+    'mu':     { d: "Pronounced like 'moo', the sound a cow makes.", h_ex: [{j: 'むし', r: 'mushi', m: 'bug'}, {j: 'むら', r: 'mura', m: 'village'}, {j: 'むずかしい', r: 'muzukashii', m: 'difficult'}], k_ex: [{j: 'ムード', r: 'muudo', m: 'mood'}, {j: 'ムース', r: 'muusu', m: 'mousse'}, {j: 'ハム', r: 'hamu', m: 'ham'}] },
+    'me':     { d: "Sounds like the 'me' in 'metal'.", h_ex: [{j: 'め', r: 'me', m: 'eye'}, {j: 'めがね', r: 'megane', m: 'glasses'}, {j: 'めだか', r: 'medaka', m: 'killifish'}], k_ex: [{j: 'メロン', r: 'meron', m: 'melon'}, {j: 'メモ', r: 'memo', m: 'memo'}, {j: 'メニュー', r: 'menyuu', m: 'menu'}] },
+    'mo':     { d: "Pronounced like 'mo' in 'more' or 'motive'.", h_ex: [{j: 'もも', r: 'momo', m: 'peach'}, {j: 'もり', r: 'mori', m: 'forest'}, {j: 'もの', r: 'mono', m: 'thing'}], k_ex: [{j: 'モーター', r: 'mootaa', m: 'motor'}, {j: 'モデル', r: 'moderu', m: 'model'}, {j: 'モニター', r: 'monitaa', m: 'monitor'}] },
+    
+    'ya':     { d: "Sounds like the word 'yacht' starting with 'yah'.", h_ex: [{j: 'やま', r: 'yama', m: 'mountain'}, {j: 'やさい', r: 'yasai', m: 'vegetable'}, {j: 'やすみ', r: 'yasumi', m: 'holiday'}], k_ex: [{j: 'ヤンキー', r: 'yankii', m: 'Yankee'}, {j: 'タイヤ', r: 'taiya', m: 'tire'}, {j: 'ダイヤ', r: 'daiya', m: 'diamond'}] },
+    'yu':     { d: "Pronounced exactly like the English word 'you'.", h_ex: [{j: 'ゆき', r: 'yuki', m: 'snow'}, {j: 'ゆめ', r: 'yume', m: 'dream'}, {j: 'ゆうびんきょく', r: 'yuubinkyoku', m: 'post office'}], k_ex: [{j: 'ユーザー', r: 'yuuzaa', m: 'user'}, {j: 'ユニフォーム', r: 'yunifoomu', m: 'uniform'}, {j: 'ユーモア', r: 'yuumoa', m: 'humor'}] },
+    'yo':     { d: "Sounds like the greeting 'yo!'.", h_ex: [{j: 'よる', r: 'yoru', m: 'night'}, {j: 'よぶ', r: 'yobu', m: 'to call'}, {j: 'よむ', r: 'yomu', m: 'to read'}], k_ex: [{j: 'ヨーロッパ', r: 'yooroppa', m: 'Europe'}, {j: 'ヨット', r: 'yotto', m: 'yacht'}, {j: 'ヨーグルト', r: 'yooguruto', m: 'yogurt'}] },
+    
+    'ra':     { d: "A light tap of the tongue, between an 'r', 'l', and 'd' plus 'ah'.", h_ex: [{j: 'らいしゅう', r: 'raishuu', m: 'next week'}, {j: 'らく', r: 'raku', m: 'easy'}, {j: 'らいげつ', r: 'raigetsu', m: 'next month'}], k_ex: [{j: 'ラジオ', r: 'rajio', m: 'radio'}, {j: 'ライオン', r: 'raion', m: 'lion'}, {j: 'ラーメン', r: 'raamen', m: 'ramen'}] },
+    'ri':     { d: "A light tap of the tongue, sounding like the 'ree' in 'reed'.", h_ex: [{j: 'りんご', r: 'ringo', m: 'apple'}, {j: 'りゆう', r: 'riyuu', m: 'reason'}, {j: 'りょこう', r: 'ryokou', m: 'travel'}], k_ex: [{j: 'リボン', r: 'ribon', m: 'ribbon'}, {j: 'リスト', r: 'risuto', m: 'list'}, {j: 'リング', r: 'ringu', m: 'ring'}] },
+    'ru':     { d: "A light tap of the tongue, sounding like 'roo' in 'root'.", h_ex: [{j: 'さる', r: 'saru', m: 'monkey'}, {j: 'はる', r: 'haru', m: 'spring'}, {j: 'よる', r: 'yoru', m: 'night'}], k_ex: [{j: 'ルール', r: 'ruuru', m: 'rule'}, {j: 'ルビー', r: 'rubii', m: 'ruby'}, {j: 'ルート', r: 'ruuto', m: 'route'}] },
+    're':     { d: "A light tap of the tongue, sounding like the 're' in 'red'.", h_ex: [{j: 'れきし', r: 'rekishi', m: 'history'}, {j: 'れんしゅう', r: 'renshuu', m: 'practice'}, {j: 'れいぞうこ', r: 'reizouko', m: 'refrigerator'}], k_ex: [{j: 'レストラン', r: 'resutoran', m: 'restaurant'}, {j: 'レモン', r: 'remon', m: 'lemon'}, {j: 'レシピ', r: 'reshipi', m: 'recipe'}] },
+    'ro':     { d: "A light tap of the tongue, sounding like 'row', as in rowing a boat.", h_ex: [{j: 'ろく', r: 'roku', m: 'six'}, {j: 'ろうそく', r: 'rousoku', m: 'candle'}, {j: 'ろくおん', r: 'rokuon', m: 'recording'}], k_ex: [{j: 'ロボット', r: 'robotto', m: 'robot'}, {j: 'ロケット', r: 'roketto', m: 'rocket'}, {j: 'ロープ', r: 'roopu', m: 'rope'}] },
+    
+    'wa':     { d: "Pronounced like the 'wa' in 'water'.", h_ex: [{j: 'わたし', r: 'watashi', m: 'I / me'}, {j: 'わに', r: 'wani', m: 'crocodile'}, {j: 'わらう', r: 'warau', m: 'to laugh'}], k_ex: [{j: 'ワイン', r: 'wain', m: 'wine'}, {j: 'ワット', r: 'watto', m: 'watt'}, {j: 'シャワー', r: 'shawaa', m: 'shower'}] },
+    'wo':     { d: "Pronounced like 'oh', used strictly as a grammatical particle.", h_ex: [{j: 'ほんを', r: 'hon wo', m: 'book (obj)'}, {j: 'みずを', r: 'mizu wo', m: 'water (obj)'}, {j: 'えを', r: 'e wo', m: 'picture (obj)'}], k_ex: [{j: 'ヲタク', r: 'wotaku', m: 'otaku (stylized)'}] },
+    
+    'n':      { d: "A nasal consonant, sounding like 'n' or 'm' at the end of a syllable.", h_ex: [{j: 'ほん', r: 'hon', m: 'book'}, {j: 'てんき', r: 'tenki', m: 'weather'}, {j: 'きんえん', r: 'kinen', m: 'no smoking'}], k_ex: [{j: 'パン', r: 'pan', m: 'bread'}, {j: 'ペン', r: 'pen', m: 'pen'}, {j: 'ボタン', r: 'botan', m: 'button'}] },
+    
+    'ga':     { d: "Sounds like the 'ga' in 'gargle'.", h_ex: [{j: 'がっこう', r: 'gakkou', m: 'school'}, {j: 'がいこく', r: 'gaikoku', m: 'foreign country'}, {j: 'がくせい', r: 'gakusei', m: 'student'}], k_ex: [{j: 'ガラス', r: 'garasu', m: 'glass'}, {j: 'ガソリン', r: 'gasorin', m: 'gasoline'}, {j: 'ガイド', r: 'gaido', m: 'guide'}] },
+    'gi':     { d: "Pronounced like the 'gee' in 'geese'.", h_ex: [{j: 'ぎんこう', r: 'ginkou', m: 'bank'}, {j: 'ぎじゅつ', r: 'gijutsu', m: 'technology'}, {j: 'かぎ', r: 'kagi', m: 'key'}], k_ex: [{j: 'ギター', r: 'gitaa', m: 'guitar'}, {j: 'ギリシャ', r: 'girisha', m: 'Greece'}, {j: 'ギャグ', r: 'gyagu', m: 'joke'}] },
+    'gu':     { d: "Sounds like the 'goo' in 'goose'.", h_ex: [{j: 'ぐあい', r: 'guai', m: 'condition'}, {j: 'ぐるぐる', r: 'guruguru', m: 'spinning'}, {j: 'ぐんたい', r: 'guntai', m: 'military'}], k_ex: [{j: 'グラス', r: 'gurasu', m: 'glass/cup'}, {j: 'グループ', r: 'guruupu', m: 'group'}, {j: 'グルメ', r: 'gurume', m: 'gourmet'}] },
+    'ge':     { d: "Pronounced like the 'ge' in 'get'.", h_ex: [{j: 'げんき', r: 'genki', m: 'healthy'}, {j: 'げつようび', r: 'getsuyoubi', m: 'Monday'}, {j: 'げき', r: 'geki', m: 'drama'}], k_ex: [{j: 'ゲーム', r: 'geemu', m: 'game'}, {j: 'ゲスト', r: 'gesuto', m: 'guest'}, {j: 'ゲート', r: 'geeto', m: 'gate'}] },
+    'go':     { d: "Sounds exactly like the word 'go'.", h_ex: [{j: 'ごはん', r: 'gohan', m: 'meal / rice'}, {j: 'ごご', r: 'gogo', m: 'afternoon'}, {j: 'ごみ', r: 'gomi', m: 'trash'}], k_ex: [{j: 'ゴルフ', r: 'gorufu', m: 'golf'}, {j: 'ゴム', r: 'gomu', m: 'rubber'}, {j: 'ゴールド', r: 'goorudo', m: 'gold'}] },
+    
+    'za':     { d: "Pronounced like the 'za' in 'bizarre'.", h_ex: [{j: 'ざっし', r: 'zasshi', m: 'magazine'}, {j: 'ざんねん', r: 'zannen', m: 'regrettable'}, {j: 'ざぶとん', r: 'zabuton', m: 'cushion'}], k_ex: [{j: 'デザイン', r: 'dezain', m: 'design'}, {j: 'ピザ', r: 'piza', m: 'pizza'}, {j: 'デザート', r: 'dezaato', m: 'dessert'}] },
+    'ji':     { d: "Sounds exactly like the word 'jeep' without the 'p'.", h_ex: [{j: 'じかん', r: 'jikan', m: 'time'}, {j: 'じてんしゃ', r: 'jitensha', m: 'bicycle'}, {j: 'じしょ', r: 'jisho', m: 'dictionary'}], k_ex: [{j: 'ラジオ', r: 'rajio', m: 'radio'}, {j: 'エンジニア', r: 'enjinia', m: 'engineer'}, {j: 'ジーンズ', r: 'jiinzu', m: 'jeans'}] },
+    'zu':     { d: "Pronounced exactly like the word 'zoo'.", h_ex: [{j: 'みず', r: 'mizu', m: 'water'}, {j: 'ずっと', r: 'zutto', m: 'always'}, {j: 'すずしい', r: 'suzushii', m: 'cool'}], k_ex: [{j: 'チーズ', r: 'chiizu', m: 'cheese'}, {j: 'スムーズ', r: 'sumuuzu', m: 'smooth'}, {j: 'サイズ', r: 'saizu', m: 'size'}] },
+    'ze':     { d: "Sounds like the 'ze' in 'zest' or 'zen'.", h_ex: [{j: 'ぜんぶ', r: 'zenbu', m: 'everything'}, {j: 'ぜんぜん', r: 'zenzen', m: 'not at all'}, {j: 'ぜいきん', r: 'zeikin', m: 'tax'}], k_ex: [{j: 'ゼリー', r: 'zerii', m: 'jelly'}, {j: 'ゼロ', r: 'zero', m: 'zero'}, {j: 'プレゼント', r: 'purezento', m: 'present'}] },
+    'zo':     { d: "Pronounced like the 'zo' in 'zone'.", h_ex: [{j: 'かぞく', r: 'kazoku', m: 'family'}, {j: 'れいぞうこ', r: 'reizouko', m: 'refrigerator'}], k_ex: [{j: 'ゾーン', r: 'zoon', m: 'zone'}, {j: 'エピソード', r: 'episuudo', m: 'episode'}, {j: 'アマゾン', r: 'amazon', m: 'Amazon'}] },
+    
+    'da':     { d: "Sounds like the 'da' in 'dad'.", h_ex: [{j: 'だいがく', r: 'daigaku', m: 'university'}, {j: 'だれ', r: 'dare', m: 'who'}, {j: 'だいじょうぶ', r: 'daijoubu', m: 'okay'}], k_ex: [{j: 'ダンス', r: 'dansu', m: 'dance'}, {j: 'ダイヤ', r: 'daiya', m: 'diamond'}, {j: 'ダブル', r: 'daburu', m: 'double'}] },
+    'dji':    { d: "An older variant, pronounced like 'jee'.", h_ex: [{j: 'はなぢ', r: 'hanadji', m: 'nosebleed'}, {j: 'ちぢむ', r: 'chidjimu', m: 'to shrink'}, {j: 'みぢかい', r: 'midjikai', m: 'short'}], k_ex: [{j: 'ヂ', r: 'ji', m: '(rare)'}] },
+    'dzu':    { d: "An older variant, pronounced like 'zoo'.", h_ex: [{j: 'つづく', r: 'tsudzuku', m: 'to continue'}, {j: 'みかづき', r: 'mikadzuki', m: 'crescent moon'}, {j: 'てづくり', r: 'tedzukuri', m: 'handmade'}], k_ex: [{j: 'ヅ', r: 'zu', m: '(rare)'}] },
+    'de':     { d: "Pronounced like the 'de' in 'desk'.", h_ex: [{j: 'でんわ', r: 'denwa', m: 'telephone'}, {j: 'でんしゃ', r: 'densha', m: 'train'}, {j: 'でぐち', r: 'deguchi', m: 'exit'}], k_ex: [{j: 'デパート', r: 'depaato', m: 'department store'}, {j: 'データ', r: 'deeta', m: 'data'}, {j: 'デザイン', r: 'dezain', m: 'design'}] },
+    'do':     { d: "Sounds like 'doe', a female deer.", h_ex: [{j: 'どうぶつ', r: 'doubutsu', m: 'animal'}, {j: 'どこ', r: 'doko', m: 'where'}, {j: 'どろ', r: 'doro', m: 'mud'}], k_ex: [{j: 'ドア', r: 'doa', m: 'door'}, {j: 'ドイツ', r: 'doitsu', m: 'Germany'}, {j: 'ドライブ', r: 'doraibu', m: 'drive'}] },
+    
+    'ba':     { d: "Pronounced like the sound sheep make: 'baa'.", h_ex: [{j: 'ばんごう', r: 'bangou', m: 'number'}, {j: 'ばしょ', r: 'basho', m: 'place'}, {j: 'かばん', r: 'kaban', m: 'bag'}], k_ex: [{j: 'バス', r: 'basu', m: 'bus'}, {j: 'バナナ', r: 'banana', m: 'banana'}, {j: 'バター', r: 'bataa', m: 'butter'}] },
+    'bi':     { d: "Sounds exactly like 'bee', the insect.", h_ex: [{j: 'びょういん', r: 'byouin', m: 'hospital'}, {j: 'びじゅつかん', r: 'bijutsukan', m: 'art museum'}, {j: 'びっくり', r: 'bikkuri', m: 'surprise'}], k_ex: [{j: 'ビール', r: 'biiru', m: 'beer'}, {j: 'ビル', r: 'biru', m: 'building'}, {j: 'ビデオ', r: 'bideo', m: 'video'}] },
+    'bu':     { d: "Pronounced like 'boo', as in scaring someone.", h_ex: [{j: 'ぶどう', r: 'budou', m: 'grapes'}, {j: 'ぶんしょう', r: 'bunshou', m: 'sentence'}, {j: 'あぶない', r: 'abunai', m: 'dangerous'}], k_ex: [{j: 'ブロック', r: 'burokku', m: 'block'}, {j: 'ブラシ', r: 'burashi', m: 'brush'}, {j: 'テーブル', r: 'teeburu', m: 'table'}] },
+    'be':     { d: "Sounds like the 'be' in 'bed'.", h_ex: [{j: 'べんきょう', r: 'benkyou', m: 'study'}, {j: 'べんり', r: 'benri', m: 'convenient'}, {j: 'たべる', r: 'taberu', m: 'to eat'}], k_ex: [{j: 'ベッド', r: 'beddo', m: 'bed'}, {j: 'ベンチ', r: 'benchi', m: 'bench'}, {j: 'ベルト', r: 'beruto', m: 'belt'}] },
+    'bo':     { d: "Pronounced like the 'bo' in 'boat'.", h_ex: [{j: 'ぼうし', r: 'boushi', m: 'hat'}, {j: 'ぼく', r: 'boku', m: 'I / me'}, {j: 'あそぶ', r: 'asobu', m: 'to play'}], k_ex: [{j: 'ボタン', r: 'botan', m: 'button'}, {j: 'ボール', r: 'booru', m: 'ball'}, {j: 'ボックス', r: 'bokkusu', m: 'box'}] },
+    
+    'pa':     { d: "Sounds like 'pa' as in father.", h_ex: [{j: 'しんぱい', r: 'shinpai', m: 'worry'}, {j: 'きっぷ', r: 'kippu', m: 'ticket'}, {j: 'いっぱい', r: 'ippai', m: 'full'}], k_ex: [{j: 'パン', r: 'pan', m: 'bread'}, {j: 'パーティー', r: 'paatii', m: 'party'}, {j: 'パイナップル', r: 'painappuru', m: 'pineapple'}] },
+    'pi':     { d: "Pronounced exactly like the letter 'P' or 'pea'.", h_ex: [{j: 'ぴかぴか', r: 'pikapika', m: 'shiny'}, {j: 'えんぴつ', r: 'enpitsu', m: 'pencil'}, {j: 'はっぴょう', r: 'happyou', m: 'presentation'}], k_ex: [{j: 'ピンク', r: 'pinku', m: 'pink'}, {j: 'ピアノ', r: 'piano', m: 'piano'}, {j: 'ピアス', r: 'piasu', m: 'piercings'}] },
+    'pu':     { d: "Sounds like the 'poo' in 'pool'.", h_ex: [{j: 'きっぷ', r: 'kippu', m: 'ticket'}, {j: 'てんぷら', r: 'tenpura', m: 'tempura'}], k_ex: [{j: 'プール', r: 'puuru', m: 'pool'}, {j: 'プラス', r: 'purasu', m: 'plus'}, {j: 'スープ', r: 'suupu', m: 'soup'}] },
+    'pe':     { d: "Pronounced like the 'pe' in 'pet'.", h_ex: [{j: 'ぺこぺこ', r: 'pekopeko', m: 'starving'}, {j: 'ぺらぺら', r: 'perapera', m: 'fluent'}], k_ex: [{j: 'ペン', r: 'pen', m: 'pen'}, {j: 'ペット', r: 'petto', m: 'pet'}, {j: 'ページ', r: 'peeji', m: 'page'}] },
+    'po':     { d: "Sounds like the 'po' in 'poke'.", h_ex: [{j: 'さんぽ', r: 'sanpo', m: 'stroll'}, {j: 'ぽかぽか', r: 'pokapoka', m: 'warm'}], k_ex: [{j: 'ポスト', r: 'posuto', m: 'postbox'}, {j: 'ポケット', r: 'poketto', m: 'pocket'}, {j: 'ポテト', r: 'poteto', m: 'potato'}] },
+
+    /* Yōon entries */
+    'kya':    { d: "Sounds like 'k' + 'ya'.", h_ex: [{j: 'きゃく', r: 'kyaku', m: 'guest'}, {j: 'きょうか', r: 'kyouka', m: 'strengthen'}], k_ex: [{j: 'キャベツ', r: 'kyabetsu', m: 'cabbage'}, {j: 'キャンプ', r: 'kyanpu', m: 'camp'}] },
+    'kyu':    { d: "Sounds like 'k' + 'yu' or 'cute'.", h_ex: [{j: 'きゅうり', r: 'kyuuri', m: 'cucumber'}, {j: 'きゅう', r: 'kyuu', m: 'nine'}], k_ex: [{j: 'キューピッド', r: 'kyuupiddo', m: 'cupid'}, {j: 'ドキュメント', r: 'dokyumento', m: 'document'}] },
+    'kyo':    { d: "Sounds like 'k' + 'yo' or 'Kyoto'.", h_ex: [{j: 'きょう', r: 'kyou', m: 'today'}, {j: 'きょねん', r: 'kyonen', m: 'last year'}], k_ex: [{j: 'トーキョー', r: 'tookyoo', m: 'Tokyo'}, {j: 'キヨスク', r: 'kiyosuku', m: 'kiosk'}] },
+    'sha':    { d: "Sounds like 'sha' in 'shark'.", h_ex: [{j: 'しゃしん', r: 'shashin', m: 'photograph'}, {j: 'しゃかい', r: 'shakai', m: 'society'}], k_ex: [{j: 'シャツ', r: 'shatsu', m: 'shirt'}, {j: 'シャワー', r: 'shawaa', m: 'shower'}] },
+    'shu':    { d: "Sounds like 'shu' in 'shoe'.", h_ex: [{j: 'しゅみ', r: 'shumi', m: 'hobby'}, {j: 'しゅくだい', r: 'shukudai', m: 'homework'}], k_ex: [{j: 'シューズ', r: 'shuuzu', m: 'shoes'}, {j: 'シュガー', r: 'shugaa', m: 'sugar'}] },
+    'sho':    { d: "Sounds like 'sho' in 'short'.", h_ex: [{j: 'しょくどう', r: 'shokudou', m: 'dining hall'}, {j: 'しょうゆ', r: 'shouyu', m: 'soy sauce'}], k_ex: [{j: 'ショップ', r: 'shoppu', m: 'shop'}, {j: 'ショート', r: 'shooto', m: 'short'}] },
+    'cha':    { d: "Sounds like 'cha' in 'charm'.", h_ex: [{j: 'おちゃ', r: 'ocha', m: 'tea'}, {j: 'ちゃいろ', r: 'chairo', m: 'brown'}], k_ex: [{j: 'チャンス', r: 'chansu', m: 'chance'}, {j: 'チャンネル', r: 'channeru', m: 'channel'}] },
+    'chu':    { d: "Sounds like 'chu' in 'chew'.", h_ex: [{j: 'ちゅうごく', r: 'chuugoku', m: 'China'}, {j: 'ちゅうしゃ', r: 'chuusha', m: 'injection'}], k_ex: [{j: 'チューブ', r: 'chuubu', m: 'tube'}, {j: 'チューインガム', r: 'chuuingamu', m: 'chewing gum'}] },
+    'cho':    { d: "Sounds like 'cho' in 'chore'.", h_ex: [{j: 'ちょきん', r: 'chokin', m: 'savings'}, {j: 'ちょっと', r: 'chotto', m: 'a little'}], k_ex: [{j: 'チョコ', r: 'choko', m: 'chocolate'}, {j: 'チョイス', r: 'choisu', m: 'choice'}] },
+    'nya':    { d: "Sounds like 'nya' (meow).", h_ex: [{j: 'こんにゃく', r: 'konnyaku', m: 'konjac'}, {j: 'はんにゃ', r: 'hannya', m: 'Hannya mask'}], k_ex: [{j: 'ニャー', r: 'nyaa', m: 'meow'}, {j: 'ラザニア', r: 'razania', m: 'lasagna'}] },
+    'nyu':    { d: "Sounds like 'new'.", h_ex: [{j: 'ぎゅうにゅう', r: 'gyuunyuu', m: 'milk'}, {j: 'にゅうがく', r: 'nyuugaku', m: 'admission'}], k_ex: [{j: 'ニュース', r: 'nyuusu', m: 'news'}, {j: 'ニュー', r: 'nyuu', m: 'new'}] },
+    'nyo':    { d: "Sounds like 'nyo'.", h_ex: [{j: 'にょう', r: 'nyou', m: 'urine'}], k_ex: [{j: 'ニョッキ', r: 'nyokki', m: 'gnocchi'}] },
+    'hya':    { d: "Sounds like 'hya'.", h_ex: [{j: 'ひゃく', r: 'hyaku', m: 'hundred'}, {j: 'ひゃっかてん', r: 'hyakkaten', m: 'department store'}], k_ex: [{j: 'ヒヤシンス', r: 'hiyashinsu', m: 'hyacinth'}] },
+    'hyu':    { d: "Sounds like 'hyu' in 'hue'.", h_ex: [{j: 'ひゅーひゅー', r: 'hyuuhyuu', m: 'whooshing'}], k_ex: [{j: 'ヒューズ', r: 'hyuuzu', m: 'fuse'}, {j: 'ヒューマン', r: 'hyuuman', m: 'human'}] },
+    'hyo':    { d: "Sounds like 'hyo'.", h_ex: [{j: 'ひょう', r: 'hyou', m: 'table/chart'}, {j: 'ひょうげん', r: 'hyougen', m: 'expression'}], k_ex: [{j: 'ヒョウ', r: 'hyou', m: 'leopard'}] },
+    'mya':    { d: "Sounds like 'mya'.", h_ex: [{j: 'みゃく', r: 'myaku', m: 'pulse'}, {j: 'さんみゃく', r: 'sanmyaku', m: 'mountain range'}], k_ex: [{j: 'ミャンマー', r: 'myanmaa', m: 'Myanmar'}] },
+    'myu':    { d: "Sounds like 'myu' in 'music'.", h_ex: [{j: 'みょうが', r: 'myouga', m: 'ginger (var)'}], k_ex: [{j: 'ミュージック', r: 'myuujikku', m: 'music'}, {j: 'ミュージカル', r: 'myuujikaru', m: 'musical'}] },
+    'myo':    { d: "Sounds like 'myo'.", h_ex: [{j: 'みょうじ', r: 'myouji', m: 'surname'}, {j: 'みょう', r: 'myou', m: 'strange'}], k_ex: [{j: 'ミョウガ', r: 'myouga', m: 'Japanese ginger'}] },
+    'rya':    { d: "Sounds like 'rya' (lightly rolled 'r').", h_ex: [{j: 'りゃく', r: 'ryaku', m: 'abbreviation'}], k_ex: [{j: 'キャリア', r: 'kyaria', m: 'career'}, {j: 'リヤカー', r: 'riyakaa', m: 'flatbed trailer'}] },
+    'ryu':    { d: "Sounds like 'ryu'.", h_ex: [{j: 'りゅう', r: 'ryuu', m: 'dragon'}, {j: 'りゅうがくせい', r: 'ryuugakusei', m: 'int. student'}], k_ex: [{j: 'リュック', r: 'ryukku', m: 'backpack'}, {j: 'ボリューム', r: 'boryuumu', m: 'volume'}] },
+    'ryo':    { d: "Sounds like 'ryo'.", h_ex: [{j: 'りょうり', r: 'ryouri', m: 'cooking'}, {j: 'りょこう', r: 'ryokou', m: 'travel'}], k_ex: [{j: 'マトリョーシカ', r: 'matoryooshika', m: 'matryoshka'}] },
+    'gya':    { d: "Sounds like 'gya'.", h_ex: [{j: 'ぎゃく', r: 'gyaku', m: 'reverse'}], k_ex: [{j: 'ギャング', r: 'gyangu', m: 'gang'}, {j: 'ギャラリー', r: 'gyararii', m: 'gallery'}] },
+    'gyu':    { d: "Sounds like 'gyu'.", h_ex: [{j: 'ぎゅうにく', r: 'gyuuniku', m: 'beef'}, {j: 'ぎゅうにゅう', r: 'gyuunyuu', m: 'milk'}], k_ex: [{j: 'レギュラー', r: 'regyuraa', m: 'regular'}, {j: 'フィギュア', r: 'figyua', m: 'figure'}] },
+    'gyo':    { d: "Sounds like 'gyo'.", h_ex: [{j: 'ぎょぎょう', r: 'gyogyou', m: 'fishing industry'}, {j: 'ぎょうじ', r: 'gyouji', m: 'event'}], k_ex: [{j: 'ギョーザ', r: 'gyooza', m: 'gyoza'}] },
+    'ja':     { d: "Sounds like 'ja' in 'jar'.", h_ex: [{j: 'じゃあ', r: 'jaa', m: 'well then'}, {j: 'じゃま', r: 'jama', m: 'hindrance'}], k_ex: [{j: 'ジャム', r: 'jamu', m: 'jam'}, {j: 'ジャケット', r: 'jaketto', m: 'jacket'}] },
+    'ju':     { d: "Sounds like 'ju' in 'juice'.", h_ex: [{j: 'じゅう', r: 'juu', m: 'ten'}, {j: 'じゅんび', r: 'junbi', m: 'preparation'}], k_ex: [{j: 'ジュース', r: 'juusu', m: 'juice'}, {j: 'ジュエリー', r: 'juerii', m: 'jewelry'}] },
+    'jo':     { d: "Sounds like 'jo' in 'joke'.", h_ex: [{j: 'じょせい', r: 'josei', m: 'woman'}, {j: 'じょうず', r: 'jouzu', m: 'skillful'}], k_ex: [{j: 'ジョギング', r: 'jogingu', m: 'jogging'}, {j: 'ジョーク', r: 'jooku', m: 'joke'}] },
+    'bya':    { d: "Sounds like 'bya'.", h_ex: [{j: 'さんびゃく', r: 'sanbyaku', m: '300'}], k_ex: [{j: 'ビャクダン', r: 'byakudan', m: 'sandalwood'}] },
+    'byu':    { d: "Sounds like 'byu'.", h_ex: [{j: 'びゅん', r: 'byun', m: 'zoom sound'}], k_ex: [{j: 'インタビュー', r: 'intabyuu', m: 'interview'}, {j: 'デビュー', r: 'debyuu', m: 'debut'}] },
+    'byo':    { d: "Sounds like 'byo'.", h_ex: [{j: 'びょういん', r: 'byouin', m: 'hospital'}, {j: 'びょうき', r: 'byouki', m: 'illness'}], k_ex: [{j: 'ビョウ', r: 'byou', m: 'tack/rivet'}] },
+    'pya':    { d: "Sounds like 'pya'.", h_ex: [{j: 'ろっぴゃく', r: 'roppyaku', m: '600'}], k_ex: [{j: 'ピャッ', r: 'pyah', m: 'peep'}] },
+    'pyu':    { d: "Sounds like 'pyu' in 'pew'.", h_ex: [{j: 'ぴゅー', r: 'pyuu', m: 'whistling sound'}], k_ex: [{j: 'コンピューター', r: 'konpyuutaa', m: 'computer'}, {j: 'ピュア', r: 'pyua', m: 'pure'}] },
+    'pyo':    { d: "Sounds like 'pyo'.", h_ex: [{j: 'はっぴょう', r: 'happyou', m: 'presentation'}, {j: 'ぴょんぴょん', r: 'pyonpyon', m: 'hopping'}], k_ex: [{j: 'チャンピオン', r: 'chanpion', m: 'champion'}] },
+
+    /* EXTENDED KATAKANA SPECIFIC */
+    'va':     { d: "Sounds like 'va'.", h_ex: [], k_ex: [{j: 'ヴァイオリン', r: 'vaiorin', m: 'violin'}, {j: 'ヴァンパイア', r: 'vanpaia', m: 'vampire'}] },
+    'vi':     { d: "Sounds like 'vi'.", h_ex: [], k_ex: [{j: 'ヴィジョン', r: 'vijon', m: 'vision'}, {j: 'ヴィーガン', r: 'viigan', m: 'vegan'}] },
+    'vu':     { d: "Sounds like 'vu'.", h_ex: [], k_ex: [{j: 'デジャヴ', r: 'dejavu', m: 'déjà vu'}] },
+    've':     { d: "Sounds like 've'.", h_ex: [], k_ex: [{j: 'ヴェール', r: 'veeru', m: 'veil'}, {j: 'ヴェネツィア', r: 'venetsia', m: 'Venice'}] },
+    'vo':     { d: "Sounds like 'vo'.", h_ex: [], k_ex: [{j: 'ヴォーカル', r: 'vookaru', m: 'vocal'}] },
+    'fa':     { d: "Sounds like 'fa'.", h_ex: [], k_ex: [{j: 'ファッション', r: 'fasshon', m: 'fashion'}, {j: 'ファイト', r: 'faito', m: 'fight'}] },
+    'fi':     { d: "Sounds like 'fi'.", h_ex: [], k_ex: [{j: 'フィルム', r: 'firumu', m: 'film'}, {j: 'フィギュア', r: 'figyua', m: 'figure'}] },
+    'fe':     { d: "Sounds like 'fe'.", h_ex: [], k_ex: [{j: 'フェンス', r: 'fensu', m: 'fence'}, {j: 'フェスティバル', r: 'fesutibaru', m: 'festival'}] },
+    'fo':     { d: "Sounds like 'fo'.", h_ex: [], k_ex: [{j: 'フォーク', r: 'fooku', m: 'fork'}, {j: 'フォーム', r: 'foomu', m: 'form'}] },
+    'wi':     { d: "Sounds like 'wi'.", h_ex: [], k_ex: [{j: 'ウィンドウ', r: 'windou', m: 'window'}, {j: 'ウィキ', r: 'wiki', m: 'wiki'}] },
+    'we':     { d: "Sounds like 'we'.", h_ex: [], k_ex: [{j: 'ウェブ', r: 'webu', m: 'web'}, {j: 'ウェット', r: 'wetto', m: 'wet'}] },
+    'ti':     { d: "Sounds like 'ti' (tea).", h_ex: [], k_ex: [{j: 'パーティー', r: 'paatii', m: 'party'}, {j: 'ティー', r: 'tii', m: 'tea'}] },
+    'tu':     { d: "Sounds like 'tu' (too).", h_ex: [], k_ex: [{j: 'タトゥー', r: 'tatuu', m: 'tattoo'}, {j: 'トゥデイ', r: 'tudei', m: 'today'}] },
+    'di':     { d: "Sounds like 'di' (dee).", h_ex: [], k_ex: [{j: 'ディスプレイ', r: 'disupurei', m: 'display'}, {j: 'ディスク', r: 'disuku', m: 'disc'}] },
+    'du':     { d: "Sounds like 'du' (doo).", h_ex: [], k_ex: [{j: 'ヒンドゥー', r: 'hinduu', m: 'Hindu'}, {j: 'ドゥードゥル', r: 'duuduru', m: 'doodle'}] },
+    'she':    { d: "Sounds like 'she' in 'shell'.", h_ex: [], k_ex: [{j: 'シェフ', r: 'shefu', m: 'chef'}, {j: 'シェア', r: 'shea', m: 'share'}] },
+    'che':    { d: "Sounds like 'che' in 'check'.", h_ex: [], k_ex: [{j: 'チェック', r: 'chekku', m: 'check'}, {j: 'チェリー', r: 'cherii', m: 'cherry'}] },
+    'je':     { d: "Sounds like 'je' in 'jet'.", h_ex: [], k_ex: [{j: 'ジェット', r: 'jetto', m: 'jet'}, {j: 'ジェリー', r: 'jerii', m: 'jelly'}] },
+    'fyu':    { d: "Sounds like 'fyu' in 'few'.", h_ex: [], k_ex: [{j: 'フュージョン', r: 'fyuujon', m: 'fusion'}, {j: 'フューエル', r: 'fyuueru', m: 'fuel'}] },
+    'tyu':    { d: "Sounds like 'tyu' in 'stew' (rare).", h_ex: [], k_ex: [{j: 'テュルク', r: 'tyuruku', m: 'Turk'}, {j: 'ステュディオ', r: 'sutyudio', m: 'studio'}] },
+    'dyu':    { d: "Sounds like 'dyu' in 'dew'.", h_ex: [], k_ex: [{j: 'フォンデュ', r: 'fondyu', m: 'fondue'}, {j: 'デュエット', r: 'dyuetto', m: 'duet'}] },
+    'xtsu':   { d: "Small tsu (Sokuon). Pauses/doubles the next consonant.", h_ex: [{j: 'がっこう', r: 'gakkou', m: 'school'}, {j: 'きっぷ', r: 'kippu', m: 'ticket'}], k_ex: [{j: 'チケット', r: 'chiketto', m: 'ticket'}, {j: 'ペット', r: 'petto', m: 'pet'}] },
+    'long':   { d: "Prolonged sound mark. Extends the previous vowel.", h_ex: [{j: 'らーめん', r: 'raamen', m: 'ramen'}], k_ex: [{j: 'コーヒー', r: 'koohii', m: 'coffee'}, {j: 'スーパー', r: 'suupaa', m: 'supermarket'}] }
+  };
+
+  const HIRA_BASIC = [
+    { r: 'a',  k: 'あ' }, { r: 'i',   k: 'い' }, { r: 'u',   k: 'う' }, { r: 'e',  k: 'え' }, { r: 'o',  k: 'お' },
+    { r: 'ka', k: 'か' }, { r: 'ki',  k: 'き' }, { r: 'ku',  k: 'く' }, { r: 'ke', k: 'け' }, { r: 'ko', k: 'こ' },
+    { r: 'sa', k: 'さ' }, { r: 'shi', k: 'し' }, { r: 'su',  k: 'す' }, { r: 'se', k: 'せ' }, { r: 'so', k: 'そ' },
+    { r: 'ta', k: 'た' }, { r: 'chi', k: 'ち' }, { r: 'tsu', k: 'つ' }, { r: 'te', k: 'て' }, { r: 'to', k: 'と' },
+    { r: 'na', k: 'な' }, { r: 'ni',  k: 'に' }, { r: 'nu',  k: 'ぬ' }, { r: 'ne', k: 'ね' }, { r: 'no', k: 'の' },
+    { r: 'ha', k: 'は' }, { r: 'hi',  k: 'ひ' }, { r: 'fu',  k: 'ふ' }, { r: 'he', k: 'へ' }, { r: 'ho', k: 'ほ' },
+    { r: 'ma', k: 'ま' }, { r: 'mi',  k: 'み' }, { r: 'mu',  k: 'む' }, { r: 'me', k: 'め' }, { r: 'mo', k: 'も' },
+    { r: 'ya', k: 'や' }, null,                  { r: 'yu',  k: 'ゆ' }, null,                 { r: 'yo', k: 'よ' },
+    { r: 'ra', k: 'ら' }, { r: 'ri',  k: 'り' }, { r: 'ru',  k: 'る' }, { r: 're', k: 'れ' }, { r: 'ro', k: 'ろ' },
+    { r: 'wa', k: 'わ' }, null,                  null,                  null,                 { r: 'wo', k: 'を' },
+    { r: 'n',  k: 'ん' }, null,                  null,                  null,                 null
+  ];
+
+  const HIRA_DAKU = [
+    { r: 'ga', k: 'が' }, { r: 'gi',  k: 'ぎ' }, { r: 'gu',  k: 'ぐ' }, { r: 'ge', k: 'げ' }, { r: 'go', k: 'ご' },
+    { r: 'za', k: 'ざ' }, { r: 'ji',  k: 'じ' }, { r: 'zu',  k: 'ず' }, { r: 'ze', k: 'ぜ' }, { r: 'zo', k: 'ぞ' },
+    { r: 'da', k: 'だ' }, { r: 'dji', k: 'ぢ' }, { r: 'dzu', k: 'づ' }, { r: 'de', k: 'で' }, { r: 'do', k: 'ど' },
+    { r: 'ba', k: 'ば' }, { r: 'bi',  k: 'び' }, { r: 'bu',  k: 'ぶ' }, { r: 'be', k: 'べ' }, { r: 'bo', k: 'ぼ' },
+    { r: 'pa', k: 'ぱ' }, { r: 'pi',  k: 'ぴ' }, { r: 'pu',  k: 'ぷ' }, { r: 'pe', k: 'ぺ' }, { r: 'po', k: 'ぽ' }
+  ];
+
+  const HIRA_YOON = [
+    { r: 'kya', k: 'きゃ' }, null, { r: 'kyu', k: 'きゅ' }, null, { r: 'kyo', k: 'きょ' },
+    { r: 'sha', k: 'しゃ' }, null, { r: 'shu', k: 'しゅ' }, null, { r: 'sho', k: 'しょ' },
+    { r: 'cha', k: 'ちゃ' }, null, { r: 'chu', k: 'ちゅ' }, null, { r: 'cho', k: 'ちょ' },
+    { r: 'nya', k: 'にゃ' }, null, { r: 'nyu', k: 'にゅ' }, null, { r: 'nyo', k: 'にょ' },
+    { r: 'hya', k: 'ひゃ' }, null, { r: 'hyu', k: 'ひゅ' }, null, { r: 'hyo', k: 'ひょ' },
+    { r: 'mya', k: 'みゃ' }, null, { r: 'myu', k: 'みゅ' }, null, { r: 'myo', k: 'みょ' },
+    { r: 'rya', k: 'りゃ' }, null, { r: 'ryu', k: 'りゅ' }, null, { r: 'ryo', k: 'りょ' },
+    { r: 'gya', k: 'ぎゃ' }, null, { r: 'gyu', k: 'ぎゅ' }, null, { r: 'gyo', k: 'ぎょ' },
+    { r: 'ja',  k: 'じゃ' }, null, { r: 'ju',  k: 'じゅ' }, null, { r: 'jo',  k: 'じょ' },
+    { r: 'bya', k: 'びゃ' }, null, { r: 'byu', k: 'びゅ' }, null, { r: 'byo', k: 'びょ' },
+    { r: 'pya', k: 'ぴゃ' }, null, { r: 'pyu', k: 'ぴゅ' }, null, { r: 'pyo', k: 'ぴょ' }
+  ];
+
+  const HIRA_EXTENDED = [
+    { r: 'va',   k: 'ゔぁ' }, { r: 'vi',  k: 'ゔぃ' }, { r: 'vu',   k: 'ゔ' },   { r: 've',   k: 'ゔぇ' }, { r: 'vo',  k: 'ゔぉ' },
+    { r: 'fa',   k: 'ふぁ' }, { r: 'fi',  k: 'ふぃ' }, { r: 'fyu',  k: 'ふゅ' }, { r: 'fe',   k: 'ふぇ' }, { r: 'fo',  k: 'ふぉ' },
+    { r: 'wi',   k: 'うぃ' }, { r: 'we',  k: 'うぇ' }, { r: 'she',  k: 'しぇ' }, { r: 'che',  k: 'ちぇ' }, { r: 'je',  k: 'じぇ' },
+    { r: 'ti',   k: 'てぃ' }, { r: 'tu',  k: 'とぅ' }, { r: 'tyu',  k: 'てゅ' }, { r: 'di',   k: 'でぃ' }, { r: 'du',  k: 'どぅ' },
+    { r: 'dyu',  k: 'でゅ' }, { r: 'xtsu',k: 'っ' },   { r: 'long', k: 'ー' },   null,                   null
+  ];
+
+  const KATA_BASIC = [
+    { r: 'a',  k: 'ア' }, { r: 'i',   k: 'イ' }, { r: 'u',   k: 'ウ' }, { r: 'e',  k: 'エ' }, { r: 'o',  k: 'オ' },
+    { r: 'ka', k: 'カ' }, { r: 'ki',  k: 'キ' }, { r: 'ku',  k: 'ク' }, { r: 'ke', k: 'ケ' }, { r: 'ko', k: 'コ' },
+    { r: 'sa', k: 'サ' }, { r: 'shi', k: 'シ' }, { r: 'su',  k: 'ス' }, { r: 'se', k: 'セ' }, { r: 'so', k: 'ソ' },
+    { r: 'ta', k: 'タ' }, { r: 'chi', k: 'チ' }, { r: 'tsu', k: 'ツ' }, { r: 'te', k: 'テ' }, { r: 'to', k: 'ト' },
+    { r: 'na', k: 'ナ' }, { r: 'ni',  k: 'ニ' }, { r: 'nu',  k: 'ヌ' }, { r: 'ne', k: 'ネ' }, { r: 'no', k: 'ノ' },
+    { r: 'ha', k: 'ハ' }, { r: 'hi',  k: 'ヒ' }, { r: 'fu',  k: 'フ' }, { r: 'he', k: 'ヘ' }, { r: 'ho', k: 'ホ' },
+    { r: 'ma', k: 'マ' }, { r: 'mi',  k: 'ミ' }, { r: 'mu',  k: 'ム' }, { r: 'me', k: 'メ' }, { r: 'mo', k: 'モ' },
+    { r: 'ya', k: 'ヤ' }, null,                  { r: 'yu',  k: 'ユ' }, null,                 { r: 'yo', k: 'ヨ' },
+    { r: 'ra', k: 'ラ' }, { r: 'ri',  k: 'リ' }, { r: 'ru',  k: 'ル' }, { r: 're', k: 'レ' }, { r: 'ro', k: 'ロ' },
+    { r: 'wa', k: 'ワ' }, null,                  null,                  null,                 { r: 'wo', k: 'ヲ' },
+    { r: 'n',  k: 'ン' }, null,                  null,                  null,                 null
+  ];
+
+  const KATA_DAKU = [
+    { r: 'ga', k: 'ガ' }, { r: 'gi',  k: 'ギ' }, { r: 'gu',  k: 'グ' }, { r: 'ge', k: 'ゲ' }, { r: 'go', k: 'ゴ' },
+    { r: 'za', k: 'ザ' }, { r: 'ji',  k: 'ジ' }, { r: 'zu',  k: 'ズ' }, { r: 'ze', k: 'ゼ' }, { r: 'zo', k: 'ゾ' },
+    { r: 'da', k: 'ダ' }, { r: 'dji', k: 'ヂ' }, { r: 'dzu', k: 'ヅ' }, { r: 'de', k: 'デ' }, { r: 'do', k: 'ド' },
+    { r: 'ba', k: 'バ' }, { r: 'bi',  k: 'ビ' }, { r: 'bu',  k: 'ブ' }, { r: 'be', k: 'ベ' }, { r: 'bo', k: 'ボ' },
+    { r: 'pa', k: 'パ' }, { r: 'pi',  k: 'ピ' }, { r: 'pu',  k: 'プ' }, { r: 'pe', k: 'ペ' }, { r: 'po', k: 'ポ' }
+  ];
+
+  const KATA_YOON = [
+    { r: 'kya', k: 'キャ' }, null, { r: 'kyu', k: 'キュ' }, null, { r: 'kyo', k: 'キョ' },
+    { r: 'sha', k: 'シャ' }, null, { r: 'shu', k: 'シュ' }, null, { r: 'sho', k: 'ショ' },
+    { r: 'cha', k: 'チャ' }, null, { r: 'chu', k: 'チュ' }, null, { r: 'cho', k: 'チョ' },
+    { r: 'nya', k: 'ニャ' }, null, { r: 'nyu', k: 'ニュ' }, null, { r: 'nyo', k: 'ニョ' },
+    { r: 'hya', k: 'ヒャ' }, null, { r: 'hyu', k: 'ヒュ' }, null, { r: 'hyo', k: 'ヒョ' },
+    { r: 'mya', k: 'ミャ' }, null, { r: 'myu', k: 'ミュ' }, null, { r: 'myo', k: 'ミョ' },
+    { r: 'rya', k: 'リャ' }, null, { r: 'ryu', k: 'リュ' }, null, { r: 'ryo', k: 'リョ' },
+    { r: 'gya', k: 'ギャ' }, null, { r: 'gyu', k: 'ギュ' }, null, { r: 'gyo', k: 'ギョ' },
+    { r: 'ja',  k: 'ジャ' }, null, { r: 'ju',  k: 'ジュ' }, null, { r: 'jo',  k: 'ジョ' },
+    { r: 'bya', k: 'ビャ' }, null, { r: 'byu', k: 'ビュ' }, null, { r: 'byo', k: 'ビョ' },
+    { r: 'pya', k: 'ピャ' }, null, { r: 'pyu', k: 'ピュ' }, null, { r: 'pyo', k: 'ピョ' }
+  ];
+
+  const KATA_EXTENDED = [
+    { r: 'va',   k: 'ヴァ' }, { r: 'vi',  k: 'ヴィ' }, { r: 'vu',   k: 'ヴ' },   { r: 've',   k: 'ヴェ' }, { r: 'vo',  k: 'ヴォ' },
+    { r: 'fa',   k: 'ファ' }, { r: 'fi',  k: 'フィ' }, { r: 'fyu',  k: 'フュ' }, { r: 'fe',   k: 'フェ' }, { r: 'fo',  k: 'フォ' },
+    { r: 'wi',   k: 'ウィ' }, { r: 'we',  k: 'ウェ' }, { r: 'she',  k: 'シェ' }, { r: 'che',  k: 'チェ' }, { r: 'je',  k: 'ジェ' },
+    { r: 'ti',   k: 'ティ' }, { r: 'tu',  k: 'トゥ' }, { r: 'tyu',  k: 'テュ' }, { r: 'di',   k: 'ディ' }, { r: 'du',  k: 'ドゥ' },
+    { r: 'dyu',  k: 'デュ' }, { r: 'xtsu',k: 'ッ' },   { r: 'long', k: 'ー' },   null,                   null
+  ];
+
+
+  let isHiragana = true;
+  let currentMode = 'basic'; // 'basic', 'dakuten', 'yoon', 'extended'
+  let currentMap = HIRA_BASIC;
+
+  const grid = document.getElementById('grid');
+  const basicBtn = document.getElementById('basicBtn');
+  const dakutenBtn = document.getElementById('dakutenBtn');
+  const yoonBtn = document.getElementById('yoonBtn');
+  const extendedBtn = document.getElementById('extendedBtn');
+  const katakanaToggle = document.getElementById('katakanaToggle');
+  const tooltip = document.getElementById('tooltip');
+
+  function computeMap() {
+    if (isHiragana) { 
+      if (currentMode === 'basic') currentMap = HIRA_BASIC;
+      else if (currentMode === 'dakuten') currentMap = HIRA_DAKU;
+      else if (currentMode === 'yoon') currentMap = HIRA_YOON;
+      else currentMap = HIRA_EXTENDED;
+    } else { 
+      if (currentMode === 'basic') currentMap = KATA_BASIC;
+      else if (currentMode === 'dakuten') currentMap = KATA_DAKU;
+      else if (currentMode === 'yoon') currentMap = KATA_YOON;
+      else currentMap = KATA_EXTENDED;
+    }
+  }
+
+  function updateModeButtons() {
+    basicBtn.classList.toggle('active', currentMode === 'basic');
+    dakutenBtn.classList.toggle('active', currentMode === 'dakuten');
+    yoonBtn.classList.toggle('active', currentMode === 'yoon');
+    extendedBtn.classList.toggle('active', currentMode === 'extended');
+  }
+
+  function showPronunciationTip(e, romaji) {
+    e.preventDefault();
+    
+    // Toggle off if clicking the same character while visible
+    if (tooltip.classList.contains('visible') && tooltip.dataset.currentRomaji === romaji) {
+      tooltip.classList.remove('visible');
+      tooltip.dataset.currentRomaji = '';
+      return;
+    }
+    
+    tooltip.dataset.currentRomaji = romaji;
+    const info = KANA_INFO[romaji];
+    
+    if (!info) {
+      tooltip.innerHTML = `
+        <div class="tip-header">
+          <span class="romaji-hl">${romaji}</span>
+        </div>
+        <div class="tip-desc">Pronunciation tip not available.</div>
+      `;
+    } else {
+      let examplesHtml = '';
+      let exList = isHiragana ? info.h_ex : info.k_ex;
+      
+      if (!exList || exList.length === 0) {
+          exList = isHiragana ? info.k_ex : info.h_ex;
+      }
+
+      if (exList && exList.length > 0) {
+        examplesHtml = '<div class="tip-examples">' + 
+          exList.map(ex => {
+            return `
+              <div class="example-item" tabindex="0" onclick="speak('${ex.j}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); speak('${ex.j}');}">
+                <span class="example-jp">${ex.j}</span>
+                <span class="example-ro">${ex.r}</span>
+                <span class="example-en">${ex.m}</span>
+              </div>`;
+          }).join('') +
+          '</div>';
+      }
+
+      tooltip.innerHTML = `
+        <div class="tip-header">
+          <span class="romaji-hl">${romaji}</span>
+        </div>
+        <div class="tip-desc">${info.d}</div>
+        ${examplesHtml}
+      `;
+    }
+    
+    // Display offscreen to measure
+    tooltip.style.left = '-9999px';
+    tooltip.style.top = '-9999px';
+    tooltip.classList.add('visible');
+
+    requestAnimationFrame(() => {
+      if (window.innerWidth > 600) {
+        const rect = tooltip.getBoundingClientRect();
+        const vw = document.documentElement.clientWidth;
+        const vh = document.documentElement.clientHeight;
+        const offset = 15;
+        
+        let x = e.clientX + offset;
+        let y = e.clientY + offset;
+        
+        if (x + rect.width > vw - offset) {
+          x = e.clientX - rect.width - offset;
+        }
+        
+        if (y + rect.height > vh - offset) {
+          y = e.clientY - rect.height - offset;
+        }
+
+        x = Math.max(offset, Math.min(x, vw - rect.width - offset));
+        y = Math.max(offset, Math.min(y, vh - rect.height - offset));
+        
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+      }
+    });
+  }
+
+  // Hide tooltip when clicking anywhere else
+  document.addEventListener('click', (e) => {
+    if (!tooltip.contains(e.target)) {
+      tooltip.classList.remove('visible');
+      tooltip.dataset.currentRomaji = '';
+    }
+  });
+
+  function renderGrid() {
+    grid.innerHTML = '';
+    
+    const topHeaders = ['', 'a', 'i', 'u', 'e', 'o'];
+    topHeaders.forEach(text => {
+      const h = document.createElement('div');
+      h.className = 'grid-header col-header';
+      h.textContent = text;
+      grid.appendChild(h);
+    });
+
+    const rowHeadersBasic = ['', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', ''];
+    const rowHeadersDaku = ['g', 'z', 'd', 'b', 'p'];
+    const rowHeadersYoon = ['ky', 'sh', 'ch', 'ny', 'hy', 'my', 'ry', 'gy', 'j', 'by', 'py'];
+    const rowHeadersExt = ['v', 'f', 'misc', 't/d', 'xtra'];
+    
+    let rowHeaders = rowHeadersBasic;
+    if (currentMode === 'dakuten') rowHeaders = rowHeadersDaku;
+    if (currentMode === 'yoon') rowHeaders = rowHeadersYoon;
+    if (currentMode === 'extended') rowHeaders = rowHeadersExt;
+
+    for (let i = 0; i < currentMap.length; i += 5) {
+      const rHead = document.createElement('div');
+      rHead.className = 'grid-header row-header';
+      rHead.textContent = rowHeaders[Math.floor(i / 5)] || '';
+      grid.appendChild(rHead);
+
+      for (let j = 0; j < 5; j++) {
+        const item = currentMap[i + j];
+        const d = document.createElement('div');
+        
+        if(!item) {
+          d.className = 'kana-cell empty';
+        } else {
+          d.className = 'kana-cell';
+          d.tabIndex = 0;
+          
+          d.innerHTML = `
+            <div class="info-btn" aria-label="Pronunciation Info" tabindex="0" title="Pronunciation Info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+            <div class="kana-char">${item.k}</div>
+            <div class="kana-romaji">${item.r}</div>
+          `;
+
+          d.onclick = (e) => speak(item.k);
+          d.onkeydown = (e) => {
+            if(e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              speak(item.k);
+            }
+          };
+
+          const infoBtn = d.querySelector('.info-btn');
+          infoBtn.onclick = (e) => {
+            e.stopPropagation();
+            showPronunciationTip(e, item.r);
+          };
+          infoBtn.onkeydown = (e) => {
+            if(e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              showPronunciationTip(e, item.r);
+            }
+          };
+        }
+        grid.appendChild(d);
+      }
+    }
+  }
+
+  function setMode() {
+    computeMap();
+    renderGrid();
+  }
+
+  // Button Handlers
+  basicBtn.onclick = () => { currentMode = 'basic'; updateModeButtons(); setMode(); };
+  dakutenBtn.onclick = () => { currentMode = 'dakuten'; updateModeButtons(); setMode(); };
+  yoonBtn.onclick = () => { currentMode = 'yoon'; updateModeButtons(); setMode(); };
+  extendedBtn.onclick = () => { currentMode = 'extended'; updateModeButtons(); setMode(); };
+  
+  katakanaToggle.onclick = () => { 
+    isHiragana = !isHiragana; 
+    katakanaToggle.textContent = isHiragana ? 'Hiragana' : 'Katakana'; 
+    setMode(); 
+  };
+
+  // ===== Audio (Text-to-Speech) =====
+  const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+  let jpVoices = [];
+
+  function loadVoices() {
+    if (!synth) return;
+    const voices = synth.getVoices();
+    jpVoices = voices.filter(v => v.lang === 'ja-JP' || v.lang === 'ja_JP' || v.lang.includes('ja'));
+  }
+
+  if (synth && synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadVoices;
+  }
+  
+  loadVoices();
+
+  function speak(t){ 
+    if(!synth) return; 
+    synth.cancel(); 
+    
+    // Japanese comma added to enforce proper intonation and prevent clipping
+    const u = new SpeechSynthesisUtterance(t + "、"); 
+    u.lang = 'ja-JP'; 
+    u.rate = 0.85; 
+    u.pitch = 1.0;
+    u.volume = 1.0; 
+
+    if (jpVoices.length > 0) {
+      const preferredVoice = jpVoices.find(v => 
+        v.name.includes('Google') || 
+        v.name.includes('Premium') || 
+        v.name.includes('Kyoko') || 
+        v.name.includes('Otoya')
+      ) || jpVoices[0];
+      u.voice = preferredVoice;
+    }
+
+    synth.speak(u); 
+  }
+
+  // ===== Initialize Application =====
+  computeMap();
+  renderGrid();
+  applyThemeFont();
+</script>
+</body>
+</html>
